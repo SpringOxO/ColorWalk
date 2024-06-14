@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -20,7 +22,9 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public User login(@RequestBody User user) {
-        return userService.findByUsername(user.getUsername());
+    public Map<String, String> getToken(@RequestBody Map<String, String> map) {
+        String username = map.get("username");
+        String password = map.get("password");
+        return userService.login(username, password);
     }
 }
