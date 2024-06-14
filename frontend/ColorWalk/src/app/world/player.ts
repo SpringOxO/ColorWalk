@@ -23,7 +23,7 @@ export class Player {
 
   private loadModel(): void {
     const loader = new GLTFLoader();
-    loader.load('assets/models/player.glb', (gltf) => {
+    loader.load('assets/models/player_1.glb', (gltf) => {
       this.model = gltf.scene;
       this.model.position.set(0, 0, 0);
       // this.last_position = this.model.position.clone();
