@@ -61,7 +61,15 @@ export class Player {
     const newPosition = this.model.position.clone().add(this.velocity.clone());
     newPosition.x = Math.round(newPosition.x / 2) * 2;
     newPosition.z = Math.round(newPosition.z / 2) * 2;
-    this.model.position.lerp(newPosition, this.easing);
+
+    const directPosition = newPosition.clone();
+    if (Math.abs(directPosition.x - this.model.position.x) > 1.0){
+      directPosition.x = this.model.position.x + Math.sign(directPosition.x - this.model.position.x) * 1;
+    }
+    if (Math.abs(directPosition.z - this.model.position.z) > 1.0){
+      directPosition.z = this.model.position.z + Math.sign(directPosition.z - this.model.position.z) * 1;
+    }
+    this.model.position.lerp(directPosition, this.easing);
 
     // const v = newPosition.clone().sub(this.model.position.clone());
     // const dist = this.model.position.distanceTo(newPosition);

@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { Player, PlayerLocal } from './player';
+import { Zone, Zone1, Zone2 } from './zone';
 
 @Injectable({ providedIn: 'root' })
 export class World implements OnDestroy {
@@ -16,6 +17,9 @@ export class World implements OnDestroy {
   private player!: PlayerLocal;
 
   private scene_scale = 0.8;
+
+
+  private zones : Zone[] = [];
 
   public constructor(private ngZone: NgZone) {
   }
@@ -50,10 +54,24 @@ export class World implements OnDestroy {
     // const material = new THREE.MeshBasicMaterial({color: 0x00ff00});
     // this.cube = new THREE.Mesh(geometry, material);
     // this.scene.add(this.cube);
-    this.loadModel();
+
+    this.initZone1();
   }
 
-  createCamera() {
+  initZone1 (){
+    //加载第一个区域
+    const zone1 : Zone1 = new Zone1(this, new THREE.Vector3(0, 0, 0));
+    this.zones.push(zone1);
+    this.initZone2();
+  }
+
+  initZone2 (){
+    const zone2 : Zone2 = new Zone2(this, this.zones[this.zones.length - 1].endV.clone());
+    // const zone2 : Zone2 = new Zone2(this, new THREE.Vector3(0, 0, -24));
+    this.zones.push(zone2);
+  }
+
+  createCamera() { //在用户初始化时被调用
     if (this.scene === undefined) return;
 
     const aspect = window.innerWidth / window.innerHeight;
@@ -71,12 +89,25 @@ export class World implements OnDestroy {
     this.scene.add(this.camera);
   }
 
-  loadModel() {
-    const loader = new GLTFLoader();
-    loader.load('assets/models/1.glb', (gltf) => {
-      this.scene.add(gltf.scene);
-      gltf.scene.position.set(-1, -1, -1);
-    });
+  cameraFollow() {
+    const playerPosition = new THREE.Vector3();
+    this.player.model.getWorldPosition(playerPosition);
+  
+    const targetPosition = new THREE.Vector3(
+      playerPosition.x + 30,
+      playerPosition.y + 30,
+      playerPosition.z + 30
+    );
+  
+    const lerpFactor = 0.02; // 调整这个值来控制相机的缓动速度
+    this.camera.position.lerp(targetPosition, lerpFactor);
+
+    const lookPosition = new THREE.Vector3(
+      this.camera.position.x - 30,
+      this.camera.position.y - 30,
+      this.camera.position.z - 30
+    );
+    this.camera.lookAt(lookPosition);
   }
 
   public animate(): void {
@@ -101,18 +132,14 @@ export class World implements OnDestroy {
     });
 
     if (this.player === undefined || this.player.model === undefined)return ;
-    if (this.player) {
+    if (this.player) { //更新用户位置，并让相机跟随
       this.player.update();
-      const playerPosition = new THREE.Vector3();
-      this.player.model.getWorldPosition(playerPosition);
-
-      this.camera.position.set(
-        playerPosition.x + 30,
-        playerPosition.y + 30,
-        playerPosition.z + 30
-      );
-      this.camera.lookAt(playerPosition);
+      this.cameraFollow();
     }
+
+    this.zones.forEach((zone) => {
+      zone.update();
+    });
 
     this.renderer.render(this.scene, this.camera);
   }
