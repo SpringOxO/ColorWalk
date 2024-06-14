@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
@@ -23,7 +24,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable() // 禁用CSRF保护，仅在必要时禁用
                 .authorizeRequests()
-                .antMatchers("/api/users/register", "/api/users/login").permitAll() // 允许未认证用户访问注册和登录端点
+                .antMatchers("/api/users/register", "/api/users/login", "/ws").permitAll() // 允许未认证用户访问注册和登录端点
                 .anyRequest().authenticated() // 其他请求需要认证
                 .and()
                 .formLogin()
@@ -33,12 +34,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll();
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                .inMemoryAuthentication()
-                .withUser("user")
-                .password(passwordEncoder().encode("password"))
-                .roles("USER");
-    }
 }

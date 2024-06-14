@@ -1,7 +1,6 @@
 package com.example.config;
 
-import com.example.computationalthinkingplatform.MyWebSocketHandler;
-import org.springframework.context.annotation.Bean;
+import com.example.computationalthinkingplatform.CustomWebSocketHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -11,13 +10,14 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(myWebSocketHandler(), "/websocket").setAllowedOrigins("*");
+    private final CustomWebSocketHandler customWebSocketHandler;
+
+    public WebSocketConfig(CustomWebSocketHandler customWebSocketHandler) {
+        this.customWebSocketHandler = customWebSocketHandler;
     }
 
-    @Bean
-    public MyWebSocketHandler myWebSocketHandler() {
-        return new MyWebSocketHandler();
+    @Override
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(customWebSocketHandler, "/ws").setAllowedOrigins("*");
     }
 }
