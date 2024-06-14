@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { EngineService } from './world.service';
+import { World } from './world.service';
 
 @Component({
   selector: 'app-world',
@@ -14,11 +14,11 @@ export class WorldComponent {
   @ViewChild('rendererCanvas', {static: true})
   public rendererCanvas!: ElementRef<HTMLCanvasElement>;
 
-  public constructor(private engServ: EngineService) {
+  public constructor(private world: World) {
   }
 
   public ngOnInit(): void {
-    this.engServ.createScene(this.rendererCanvas);
-    this.engServ.animate();
+    this.world.createScene(this.rendererCanvas);
+    this.world.animate();
   }
 }
