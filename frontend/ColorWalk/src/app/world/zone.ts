@@ -10,16 +10,21 @@ import { PI } from 'three/examples/jsm/nodes/Nodes.js';
 export class Zone {
 
     public corridorModelPath : string = '';
+    public airWallPath : string = '';
     public endV : THREE.Vector3 = new THREE.Vector3();
 
     constructor(public world: World, public startV : THREE.Vector3) {
         this.endV = startV.clone();
         this.loadCorridorModel();
+        this.loadAirWall();
         this.loadDecorationModel();
     }
 
     loadCorridorModel(): void{
         
+    }
+
+    loadAirWall(): void{
     }
 
     loadDecorationModel(): void{
@@ -49,6 +54,17 @@ export class Zone1 extends Zone {
         loader.load(this.corridorModelPath, (gltf) => {
             this.world.scene.add(gltf.scene);
             gltf.scene.position.set(this.startV.x, this.startV.y, this.startV.z);
+        });
+    }
+
+    override loadAirWall(): void {
+        this.corridorModelPath = 'assets/models/airwall_1.glb';
+        const loader = new GLTFLoader();
+        loader.load(this.corridorModelPath, (gltf) => {
+            this.world.scene.add(gltf.scene);
+            gltf.scene.position.set(this.startV.x, this.startV.y, this.startV.z);
+            gltf.scene.visible = false;
+            this.world.airWalls.push(gltf.scene);
         });
     }
 
@@ -95,6 +111,9 @@ export class Zone1 extends Zone {
 
 @Injectable()
 export class Zone2 extends Zone {
+    private corridorMaterials: THREE.MeshStandardMaterial[] = [];//用来做模型透明度变化，虽然那些material不是MeshStandardMaterial，但不知道为什么这数组能用
+    private fadeDuration: number = 2; // 渐变持续时间(秒)
+
 
     private lines_y: THREE.Group[] = [];
     private lines_y_base_pos : THREE.Vector3[] = [];
@@ -116,6 +135,16 @@ export class Zone2 extends Zone {
         this.corridorModelPath = 'assets/models/corridor_2.glb';
         const loader = new GLTFLoader();
         loader.load(this.corridorModelPath, (gltf) => {
+            gltf.scene.traverse((child) => {
+                if (child instanceof THREE.Mesh) { //设置全透明
+                    // console.log("yes");
+                    const material = child.material;
+                    material.transparent = true;
+                    material.opacity = 0;
+                    this.corridorMaterials.push(material);
+                }
+            });
+
             this.world.scene.add(gltf.scene);
             gltf.scene.position.set(this.startV.x, this.startV.y, this.startV.z);
         });
@@ -126,6 +155,15 @@ export class Zone2 extends Zone {
         v.z -= 0.9;
         const loader = new GLTFLoader();
         loader.load(modelPath, (gltf) => {
+            gltf.scene.traverse((child) => { //设置透明
+                if (child instanceof THREE.Mesh) {
+                    const material = child.material;
+                    material.transparent = true;
+                    material.opacity = 0;
+                    this.corridorMaterials.push(material);
+                }
+            });
+
             this.world.scene.add(gltf.scene);
             const pos = this.startV.clone().add(v);
             gltf.scene.position.set(pos.x, pos.y, pos.z);
@@ -139,6 +177,15 @@ export class Zone2 extends Zone {
         v.y += 1.2;
         const loader = new GLTFLoader();
         loader.load(modelPath, (gltf) => {
+            gltf.scene.traverse((child) => {
+                if (child instanceof THREE.Mesh) {
+                    const material = child.material;
+                    material.transparent = true;
+                    material.opacity = 0;
+                    this.corridorMaterials.push(material);
+                }
+            });
+
             this.world.scene.add(gltf.scene);
             gltf.scene.rotateX(Math.PI / 2);
             const pos = this.startV.clone().add(v);
@@ -165,32 +212,23 @@ export class Zone2 extends Zone {
         this.loadLineZModel('assets/models/line_5.glb', new THREE.Vector3(-14, -2, -16));
         this.loadLineZModel('assets/models/line_3.glb', new THREE.Vector3(-4, -2, -40));
         this.loadLineZModel('assets/models/line_6.glb', new THREE.Vector3(-2, -2, -40));
-
-        // this.loadLineZModel('assets/models/line_1.glb', new THREE.Vector3(2,-7,-30));
-        // this.loadLineZModel('assets/models/line_4.glb', new THREE.Vector3(-8,7,-18));
-        // this.loadLineZModel('assets/models/line_4.glb', new THREE.Vector3(-8,9,-20));
-
-
-
-        // loader.load('assets/models/balloon_2.glb', (gltf) => {
-        //     this.world.scene.add(gltf.scene);
-        //     const pos = this.startV.clone().add(new THREE.Vector3(15, 5, -3));
-        //     gltf.scene.position.set(pos.x, pos.y, pos.z);
-        //     this.balloons.push(gltf.scene);
-        //     this.balloon_base_pos.push(pos);
-        // });
-
-        // loader.load('assets/models/balloon_3.glb', (gltf) => {
-        //     this.world.scene.add(gltf.scene);
-        //     const pos = this.startV.clone().add(new THREE.Vector3(-5, 9, -9));
-        //     gltf.scene.position.set(pos.x, pos.y, pos.z);
-        //     this.balloons.push(gltf.scene);
-        //     this.balloon_base_pos.push(pos);
-        // });
     }
 
     override update(): void {
         const time = this.clock.getElapsedTime();
+
+        //随时间让材质变不透明
+        if (time <= this.fadeDuration) {
+            const opacity = time / this.fadeDuration;
+            this.corridorMaterials.forEach((material) => {
+              material.opacity = opacity;
+            });
+          } else {
+            this.corridorMaterials.forEach((material) => {
+              material.opacity = 1;
+            });
+        }
+
         const amplitude = 1;
         const frequency = 1.5;
 

@@ -21,6 +21,8 @@ export class World implements OnDestroy {
 
   private zones : Zone[] = [];
 
+  public airWalls : THREE.Group<THREE.Object3DEventMap> [] = [];
+
   public constructor(private ngZone: NgZone) {
   }
 

@@ -15,6 +15,8 @@ export class Player {
   public velocity: THREE.Vector3 = new THREE.Vector3(); //当前运动速度向量
   public easing: number = 0.08; //用于运动的缓动插值，越小越慢
 
+  private raycaster: THREE.Raycaster = new THREE.Raycaster();
+
   // public last_position: THREE.Vector3 = new THREE.Vector3();
 
   constructor(private world: World) {
@@ -62,6 +64,21 @@ export class Player {
     newPosition.x = Math.round(newPosition.x / 2) * 2;
     newPosition.z = Math.round(newPosition.z / 2) * 2;
 
+
+    
+    this.world.airWalls.forEach((airWall) => {
+      if (airWall) {
+        // console.log(this.world.airWalls);
+        this.raycaster.set(this.model.position, newPosition.clone().sub(this.model.position).normalize());
+        const intersects = this.raycaster.intersectObject(airWall, true);
+        if (intersects.length > 0 && intersects[0].distance < 1) {
+          // 如果距离小于 1,阻止玩家继续移动
+          newPosition.copy(this.model.position);
+        }
+      }
+    });
+    
+
     const directPosition = newPosition.clone();
     if (Math.abs(directPosition.x - this.model.position.x) > 1.0){
       directPosition.x = this.model.position.x + Math.sign(directPosition.x - this.model.position.x) * 1;
@@ -70,18 +87,6 @@ export class Player {
       directPosition.z = this.model.position.z + Math.sign(directPosition.z - this.model.position.z) * 1;
     }
     this.model.position.lerp(directPosition, this.easing);
-
-    // const v = newPosition.clone().sub(this.model.position.clone());
-    // const dist = this.model.position.distanceTo(newPosition);
-    // // if (dist < 0.9 && dist > 0){
-    // //   console.log(dist);
-    // //   console.log(Math.sign(this.velocity.x) * Math.min(dist, 0.9) * 2);
-    // // }
-
-    // this.model.rotation.z = (Math.abs(v.x) > 0.05 ? Math.sign(v.x) : 0) * Math.min(dist, 0.9) * 0.5;
-    // this.model.rotation.x = - (Math.abs(v.z) > 0.05 ? Math.sign(v.z) : 0) * Math.min(dist, 0.9) * 0.5;
-
-    // this.last_position = this.model.position.clone();
 
     const targetRotationZ = Math.sign(this.velocity.x) * (Math.abs(this.velocity.x) > 0.05 ? 0.5 : 0);
     this.model.rotation.z = THREE.MathUtils.lerp(this.model.rotation.z, targetRotationZ, this.easing);
