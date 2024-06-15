@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+</head>
+
+<body id="myBody" style="overflow: hidden;">
+    <i *ngFor="let drop of raindrops" [style.width]="drop.width" [style.left]="drop.left"
+        [style.animation-delay]="drop.animationDelay" [style.animation-duration]="drop.animationDuration">
+    </i>
+    <div class="container">
+        <div class="login-window">
+            <img src="./assets/pictures/LoginWindow.png" alt="登录背景" class="background-image">
+            <h2 class="title">登录</h2>
+            <div class="form-field">
+                <mat-form-field appearance="outline" class="input-field">
+                    <mat-label>Username</mat-label>
+                    <input matInput placeholder="">
+                </mat-form-field>
+            </div>
+            <div class="form-field">
+                <mat-form-field appearance="outline" class="input-field">
+                    <mat-label>Password</mat-label>
+                    <input matInput type="password" placeholder="">
+                </mat-form-field>
+            </div>
+            <div class="button-group">
+                <button mat-raised-button color="primary" class="full-width-button login-button">LOG IN</button>
+                <button mat-raised-button color="accent" class="full-width-button register-button">REGISTER</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
