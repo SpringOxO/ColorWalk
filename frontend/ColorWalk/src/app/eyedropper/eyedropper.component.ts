@@ -38,7 +38,7 @@ export class EyedropperComponent {
       console.log('按Esc可退出');
       try {
         const result = await eyeDropper.open();
-        // 移除可能存在的 "#" 字符
+        console.log(result);
         let hexColor = result.sRGBHex.replace("#", "");
         decimalValue = parseInt(hexColor, 16);
         console.log('获得颜色: ' + result.sRGBHex);

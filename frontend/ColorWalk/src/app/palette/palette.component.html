@@ -1,16 +1,16 @@
 
 <div style="display: flex;">
-    <div id="colors" style="margin-left: 0px; margin-top: 15px; width: 200px;">
+    <div id="colors" style="margin-left: 0px; margin-top: 5vh; width: 200px;">
         <div class="col-4" *ngFor="let color of buttonColors;">
             <button class="singleColor" [style.backgroundColor]="color"
             (mousedown)="changeColor(color)"(mouseup)="changeColorFinish()"></button>
         </div>
     </div>
-    <button class="closeButton"><mat-icon>close</mat-icon></button>
+    <button class="closeButton" (click)="closePalette()"><mat-icon>close</mat-icon></button>
     <button class="refreshButton" (click)="tryAgain()"><mat-icon>refresh</mat-icon></button>
     <div style="margin-left: 50px; margin-top: 40px;">
         <div [ngStyle]="currentColorDiv"></div>
-        <canvas #myCanvas id="myCanvas" width="300" height="300" style="border: 1px solid black; cursor: crosshair; margin-top: 20px;"
+        <canvas #myCanvas id="myCanvas" width="300" height="300vh" style="border: 1px solid black; cursor: crosshair; margin-top: 20px;"
         (mousedown)="paletteMouseDown($event)" (mouseup)="paletteMouseUp($event)"
         (mousemove)="paletteMouseMove($event)"></canvas>
     </div>

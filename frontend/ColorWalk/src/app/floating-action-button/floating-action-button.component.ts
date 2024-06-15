@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { EyedropperComponent } from '../eyedropper/eyedropper.component';
 import { ColorService } from '../color.service';
 import { PaletteComponent } from '../palette/palette.component';
+import { PaletteCloseService } from '../palette-close.service';
 
 @Component({
   selector: 'app-floating-action-button',
@@ -18,7 +19,15 @@ export class FloatingActionButtonComponent {
   hasEyeDrop = this.eyedropper.eyeDropper();
   showPalette: boolean = false;
 
-  constructor(private colorService: ColorService) {}
+  constructor(private colorService: ColorService, private paletteCloseService: PaletteCloseService) {}
+
+  public ngOnInit(): void {
+    this.paletteCloseService.currentCloseState.subscribe(close => {
+      if (close) {
+        this.showPalette = false;
+      }
+    });
+  }
 
   pickerStyles: {[key: string]: string} = {
     color: 'black',
@@ -47,6 +56,7 @@ export class FloatingActionButtonComponent {
     const color = await this.eyedropper.nativePick(event);
     this.colorService.changeColor(color);
     const stringColor = '#' + color.toString(16).padStart(6, '0');
+    console.log('Color: ' + stringColor);
     this.changeStyles(stringColor);
   }
 }

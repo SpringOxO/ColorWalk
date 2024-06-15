@@ -2,6 +2,7 @@ import { Component, ViewChild, ElementRef, AfterViewChecked, HostListener} from 
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { PaletteColorService } from '../palette-color.service';
+import { PaletteCloseService } from '../palette-close.service';
 
 @Component({
   selector: 'app-palette',
@@ -33,11 +34,11 @@ export class PaletteComponent implements AfterViewChecked {
   currentColorDiv: {[key: string]: string} = {
     'background-color': '#ffffff',
     width: '300px',
-    height: '300px',
+    height: '45%',
     border: '1px solid black'
   };
 
-  constructor(private paletteColorService: PaletteColorService) { }
+  constructor(private paletteColorService: PaletteColorService, private paletteCloseService: PaletteCloseService) { }
 
   ngAfterViewChecked() {
     const canvas = this.canvasRef.nativeElement;
@@ -194,5 +195,9 @@ export class PaletteComponent implements AfterViewChecked {
       this.ctx.fillStyle = 'white'; // 设置画布的填充颜色为白色
       this.ctx.fillRect(0, 0, this.canvasRef.nativeElement.width, this.canvasRef.nativeElement.height); // 填充整个画布
     }
+  }
+
+  public closePalette() {
+    this.paletteCloseService.closePalette(true);
   }
 }
