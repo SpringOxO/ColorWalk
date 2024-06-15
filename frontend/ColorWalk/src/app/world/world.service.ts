@@ -13,6 +13,9 @@ export class World implements OnDestroy {
   public scene!: THREE.Scene;
   private light!: THREE.AmbientLight;
   private controls!: OrbitControls;
+  private raycaster = new THREE.Raycaster();
+  private mouse = new THREE.Vector2();
+  private savedColor = [1, 1, 0];
 
   private player!: PlayerLocal;
 
@@ -111,6 +114,7 @@ export class World implements OnDestroy {
     );
     this.camera.lookAt(lookPosition);
   }
+  
 
   public animate(): void {
     this.ngZone.runOutsideAngular(() => {

@@ -1,0 +1,30 @@
+.singleColor {
+    height: 100px;
+    width: 150px;
+    margin-top: -3px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    cursor: pointer;
+}
+
+.closeButton {
+    position: absolute;
+    right: 0;
+    top: 0;
+    background-color: transparent;
+    color: black;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.refreshButton {
+    position: absolute;
+    right: 40px;
+    top: 0;
+    background-color: transparent;
+    color: black;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+}

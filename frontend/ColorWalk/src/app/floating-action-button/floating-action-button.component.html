@@ -1,0 +1,11 @@
+
+<button mat-fab class="fab-main" (click)="toggleToolMenu()">
+    <mat-icon>more_vert</mat-icon>
+  </button>
+  <div class="fab-actions" *ngIf="buttonsVisible">
+    <button mat-mini-fab class="fab-button" (click)="nativePick()"><mat-icon [ngStyle]="pickerStyles">colorize icon</mat-icon></button>
+    <button mat-mini-fab class="fab-button" (click)="callPalette()"><mat-icon>color_lens</mat-icon></button>
+    <button mat-mini-fab class="fab-button" (click)="performAction('action3')"><mat-icon>format_paint</mat-icon></button>
+  </div>
+<app-palette class="palette" [class.open]="showPalette"></app-palette>
+  
