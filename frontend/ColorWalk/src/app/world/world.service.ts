@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { Player, PlayerLocal } from './player';
-import { Zone, Zone1, Zone2 } from './zone';
+import { Zone, Zone1, Zone2, Zone3 } from './zone';
 
 @Injectable({ providedIn: 'root' })
 export class World implements OnDestroy {
@@ -74,6 +74,14 @@ export class World implements OnDestroy {
     const zone2 : Zone2 = new Zone2(this, this.zones[this.zones.length - 1].endV.clone());
     // const zone2 : Zone2 = new Zone2(this, new THREE.Vector3(0, 0, -24));
     this.zones.push(zone2);
+
+    this.initZone3();
+  }
+
+  initZone3 (){
+    const zone3 : Zone3 = new Zone3(this, this.zones[this.zones.length - 1].endV.clone());
+    // const zone2 : Zone2 = new Zone2(this, new THREE.Vector3(0, 0, -24));
+    this.zones.push(zone3);
   }
 
   createCamera() { //在用户初始化时被调用
