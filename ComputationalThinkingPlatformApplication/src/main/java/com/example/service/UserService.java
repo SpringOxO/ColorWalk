@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.mapper.UserMapper;
 import com.example.model.User;
 import com.example.repository.UserRepository;
@@ -14,30 +15,41 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
 public class UserService {
-
+    @Autowired
+    UserMapper userMapper;
+    @Autowired
+    private AuthenticationManager authenticationManager;
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public User registerUser(User user) {
+    public String registerUser(User user) {
+        String status;
+        // 用户名唯一性检查
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", user.getUsername());
+        List<User> userList = userMapper.selectList(queryWrapper);
+        if (!userList.isEmpty()) {
+            status = "用户已存在";
+            return status;
+        }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        userMapper.insert(user);
+        return "注册成功";
     }
 
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
-    @Autowired
-    UserMapper userMapper;
-    @Autowired
-    private AuthenticationManager authenticationManager;
     public Map<String, String> login(String username, String password) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(username, password);
@@ -48,7 +60,7 @@ public class UserService {
             UserDetailsImpl loginUser = (UserDetailsImpl) authenticate.getPrincipal();
             User user = loginUser.getUser();
             String jwt = new String();
-            jwt = JwtUtil.createJWT(user.getId().toString());
+            jwt = JwtUtil.createJWT(Integer.toString(user.getId()));
             map.put("message", "success");
             map.put("token", jwt);
         } catch (AuthenticationException e) {

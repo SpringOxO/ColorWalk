@@ -12,8 +12,8 @@ import javax.persistence.Id;
 public class LearningRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private Long userId;
+    private int id;
+    private int userId;
     private String scene;
     private String progress;
 }
