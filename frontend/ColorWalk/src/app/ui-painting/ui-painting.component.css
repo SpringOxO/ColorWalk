@@ -1,12 +1,17 @@
 .painting-frame {
     border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .teardrops {
+    position: relative;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-}
+    height: 460px; /* 根据需要调整高度 */
+  }
 
 .large-teardrop,
 .small-teardrop {
@@ -18,8 +23,16 @@
 }
 
 .color-selections {
-    margin-top: 20px;
-}
+    position: absolute;
+    top: 50%; /* 调整垂直位置 */
+    left: 50%; /* 调整水平位置 */
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+  }
 
 .color-drop {
     width: 30px;
@@ -36,57 +49,40 @@
 .ui-painting {
     display: flex;
     justify-content: space-between;
-    padding: 20px;
-
-    /* .left-panel,
-    .right-panel {
-        mat-card {
-            display: flex;
-            flex-direction: column;
-        }
-    }
-
-    .painting-frame {
-        border: 1px solid black;
-        max-width: 300px; 
-    }
-
-    .color-drop.selected {
-        border: 2px solid black;
-    } */
+    padding: 30px;
 }
 
-/* CSS for teardrop shapes */
 .teardrop {
-    width: 30px;
-    /* Width of the teardrop */
-    height: 45px;
-    /* Height of the teardrop */
+    width: 44px;
+    height: 66px;
     background-color: #000;
-    /* Default color, will be overridden by Angular */
-    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-    transform: rotate(45deg);
+    /* background-image: url('/water.svg'); */
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
     cursor: pointer;
     margin: 5px;
-    transition: background-color 0.3s;
-    /* Smooth transition for color change */
+    transition: transform 0.3s, filter 0.3s;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    transform: rotate(45deg);
+    border: 2px solid #fff;
 }
 
 .teardrop.large {
     width: 50px;
-    /* Larger width */
     height: 75px;
-    /* Larger height */
+}
+
+.teardrop.medium {
+    width: 40px;
+    height: 60px;
 }
 
 .teardrop.small {
-    width: 20px;
-    /* Smaller width */
-    height: 30px;
-    /* Smaller height */
+    width: 25px;
+    height: 37px;
 }
 
 .teardrop.selected {
     border: 2px solid #fff;
-    /* White border for selected color */
 }

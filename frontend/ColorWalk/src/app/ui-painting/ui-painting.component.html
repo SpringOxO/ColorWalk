@@ -1,23 +1,21 @@
 <div class="ui-painting">
   <button (click)="onClose()"> 《 </button>
     <mat-card class="left-panel">
-      <mat-card-header>
-        <mat-card-title>Toning Time!</mat-card-title>
-      </mat-card-header>
       <mat-card-content>
         <div class="painting-frame">
-          <img src="./assets/pictures/Mona_Lisa.jpg" alt="Blurred Painting" style="max-width: 100%; height: auto;">
+          <img src="./assets/pictures/Mona_Lisa.jpg" alt="Blurred Painting" style="max-width: 420px; height: auto;">
         </div>
       </mat-card-content>
     </mat-card>
   
     <mat-card class="right-panel">
+      <mat-card-header>
+        <mat-card-title><h5>Toning!</h5></mat-card-title>
+      </mat-card-header>
         <div class="teardrops">
             <div class="teardrop large" [style.background-color]="currentColor"></div>
-            <div class="teardrop small" [style.background-color]="currentColor"></div>
           </div>
           <mat-card-content>
-            <h3>My Colors</h3>
             <div class="color-selections">
               <div *ngFor="let drop of colorDrops" class="teardrop"
                    [style.background-color]="drop.color"

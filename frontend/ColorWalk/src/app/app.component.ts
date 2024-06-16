@@ -75,7 +75,7 @@ export class AppComponent {
 
   @HostListener('document:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent) {
-    if (event.key === 't' || event.key === 'T') {
+    if (event.key === '`') {
       this.onOpenPainting();
     }
   }
