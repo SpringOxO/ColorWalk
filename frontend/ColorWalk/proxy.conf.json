@@ -1,0 +1,10 @@
+{
+    "/ai": {
+      "target": "https://dashscope.aliyuncs.com",
+      "secure": false,
+      "changeOrigin": true,
+      "pathRewrite": {
+        "^/ai": ""
+      }
+    }
+  }

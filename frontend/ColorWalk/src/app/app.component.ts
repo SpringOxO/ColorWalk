@@ -69,6 +69,10 @@ export class AppComponent {
     this.router.navigate(['/whiteworld']);
   }
 
+  jumpToAI(): void{
+    this.router.navigate(['/chat']);
+  }
+
   @HostListener('document:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent) {
     if (event.key === 't' || event.key === 'T') {
