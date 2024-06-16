@@ -17,6 +17,7 @@ export class Zone {
         this.endV = startV.clone();
         this.loadCorridorModel();
         this.loadAirWall();
+        this.loadPainting();
         this.loadDecorationModel();
     }
 
@@ -25,6 +26,10 @@ export class Zone {
     }
 
     loadAirWall(): void{
+    }
+
+    loadPainting(): void{
+
     }
 
     loadDecorationModel(): void{
@@ -63,6 +68,22 @@ export class Zone1 extends Zone {
         loader.load(this.corridorModelPath, (gltf) => {
             this.world.scene.add(gltf.scene);
             gltf.scene.position.set(this.startV.x, this.startV.y, this.startV.z);
+            gltf.scene.visible = false;
+            this.world.airWalls.push(gltf.scene);
+        });
+    }
+
+    override loadPainting(): void {
+        const loader = new GLTFLoader();
+        loader.load('assets/models/painting_1.glb', (gltf) => {
+            this.world.scene.add(gltf.scene);
+            const pos = this.endV.clone().add(new THREE.Vector3(0, 2, 0));
+            gltf.scene.position.set(pos.x, pos.y, pos.z);
+        });
+        loader.load('assets/models/airwall_unit.glb', (gltf) => {
+            this.world.scene.add(gltf.scene);
+            const pos = this.endV.clone();
+            gltf.scene.position.set(pos.x, pos.y, pos.z);
             gltf.scene.visible = false;
             this.world.airWalls.push(gltf.scene);
         });

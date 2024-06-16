@@ -18,7 +18,7 @@ export class PaletteComponent implements AfterViewChecked {
   private currentColor = '#ffffff';
   private colorAmount = 0;
   private maxColorAmount = 10;
-  buttonColors: string[] = ['#ff0000', '#00ff00', '#0000ff', '#000000', '#ffffff', '#ffffff', '#ffffff'];
+  buttonColors: string[] = ['#ffff00', '#ff00ff', '#00ffff', '#000000', '#ffffff', '#ffffff', '#ffffff'];
   pressTimer: any;
   pressIntervalTimer: any;
   longClick: boolean = false;
@@ -150,15 +150,15 @@ export class PaletteComponent implements AfterViewChecked {
       this.mixColor(this.pickedColor);
     }
     this.colorLongClick = false;
-    if (this.colorAmount >= this.maxColorAmount) {
-      alert('You have reached the maximum color amount');
-    } else {
+    // if (this.colorAmount >= this.maxColorAmount) {
+    //   alert('You have reached the maximum color amount');
+    // } else {
       this.paletteColorService.changeColor(this.currentColor);
-    }
+    // }
   }
 
   mixColor(color: string) {
-    this.colorAmount++;
+    // this.colorAmount++;
     const currentRgb = this.hexToRgb(this.currentColor);
     const newRgb = this.hexToRgb(color);
     console.log(currentRgb);
@@ -168,13 +168,48 @@ export class PaletteComponent implements AfterViewChecked {
       console.log(this.currentColorDiv['background-color']);
       return;
     }
-    let rate = 0.9 + 0.1 * this.colorAmount / this.maxColorAmount;
-    if (rate > 1) {
-      rate = 1;
-    }
-    const r = Math.round(currentRgb.r * rate + newRgb.r * (1- rate)).toString(16).padStart(2, '0');;
-    const g = Math.round(currentRgb.g * rate + newRgb.g * (1- rate)).toString(16).padStart(2, '0');;
-    const b = Math.round(currentRgb.b * rate + newRgb.b * (1- rate)).toString(16).padStart(2, '0');;
+    //更新一下调色逻辑：插值
+
+    // const currentRr = currentRgb.r / 255;
+    // const currentGr = currentRgb.g / 255;
+    // const currentBr = currentRgb.b / 255;
+    // const currentK= 1-Math.max(currentRr, currentGr, currentGr);
+    // const currentC= (1-currentRr-currentK) / (1-currentK);
+    // const currentM= (1-currentGr-currentK) / (1-currentK);
+    // const currentY= (1-currentBr-currentK) / (1-currentK);
+
+
+    //平均法混色逻辑
+    // const rate = 0.05;
+    // const r = Math.round(currentRgb.r + (newRgb.r -  currentRgb.r) * rate).toString(16).padStart(2, '0');
+    // const g = Math.round(currentRgb.g + (newRgb.g -  currentRgb.g) * rate).toString(16).padStart(2, '0');
+    // const b = Math.round(currentRgb.b + (newRgb.b -  currentRgb.b) * rate).toString(16).padStart(2, '0');
+
+    const rate = 0.05;
+    const meanr = currentRgb.r + (newRgb.r -  currentRgb.r) * rate;
+    const meang = currentRgb.g + (newRgb.g -  currentRgb.g) * rate;
+    const meanb = currentRgb.b + (newRgb.b -  currentRgb.b) * rate;
+
+    const minr = Math.min(meanr, currentRgb.r);
+    const ming = Math.min(meang, currentRgb.g);
+    const minb = Math.min(meanb, currentRgb.b);
+
+    const r = Math.round(0.5 * meanr + 0.5 * minr).toString(16).padStart(2, '0');;
+    const g = Math.round(0.5 * meang + 0.5 * ming).toString(16).padStart(2, '0');;
+    const b = Math.round(0.5 * meanb + 0.5 * minb).toString(16).padStart(2, '0');;
+
+
+    // let rate = 0.9 + 0.1 * this.colorAmount / this.maxColorAmount;
+    // if (rate > 1) {
+    //   rate = 1;
+    // }
+    // const g = Math.round(currentRgb.g * rate + newRgb.g * (1- rate)).toString(16).padStart(2, '0');;
+    // const b = Math.round(currentRgb.b * rate + newRgb.b * (1- rate)).toString(16).padStart(2, '0');;
+    // const r = Math.round((currentRgb.r + newRgb.r * (this.colorAmount)) / (this.colorAmount + 1) ).toString(16).padStart(2, '0');;
+    // const g = Math.round((currentRgb.g + newRgb.g * (this.colorAmount)) / (this.colorAmount + 1) ).toString(16).padStart(2, '0');;
+    // const b = Math.round((currentRgb.b + newRgb.b * (this.colorAmount)) / (this.colorAmount + 1) ).toString(16).padStart(2, '0');;
+    // this.colorAmount ++;
+
     this.currentColor = '#' + r + g + b;
     this.currentColorDiv['background-color'] = this.currentColor;
     console.log(this.currentColorDiv['background-color']);
