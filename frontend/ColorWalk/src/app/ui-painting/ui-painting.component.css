@@ -38,7 +38,7 @@
     justify-content: space-between;
     padding: 20px;
 
-    .left-panel,
+    /* .left-panel,
     .right-panel {
         mat-card {
             display: flex;
@@ -48,12 +48,12 @@
 
     .painting-frame {
         border: 1px solid black;
-        max-width: 300px; /* Limit the size of the painting*/
+        max-width: 300px; 
     }
 
     .color-drop.selected {
         border: 2px solid black;
-    }
+    } */
 }
 
 /* CSS for teardrop shapes */

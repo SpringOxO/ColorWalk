@@ -17,18 +17,18 @@
             <div class="form-field">
                 <mat-form-field appearance="outline" class="input-field">
                     <mat-label>Username</mat-label>
-                    <input matInput placeholder="">
+                    <input matInput [(ngModel)]="username" placeholder="">
                 </mat-form-field>
             </div>
             <div class="form-field">
                 <mat-form-field appearance="outline" class="input-field">
                     <mat-label>Password</mat-label>
-                    <input matInput type="password" placeholder="">
+                    <input matInput [(ngModel)]="password" type="password" placeholder="">
                 </mat-form-field>
             </div>
             <div class="button-group">
-                <button mat-raised-button color="primary" class="full-width-button login-button">LOG IN</button>
-                <button mat-raised-button color="accent" class="full-width-button register-button">REGISTER</button>
+                <button mat-raised-button color="primary" class="full-width-button login-button" (click)="onLogin()">LOG IN</button>
+                <button mat-raised-button color="accent" class="full-width-button register-button" (click)="onRegister()">REGISTER</button>
             </div>
         </div>
     </div>

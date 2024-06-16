@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 
@@ -28,5 +28,11 @@ export class UiPaintingComponent {
     this.colorDrops.forEach(d => d.selected = false);
     drop.selected = true;
     this.currentColor = drop.color;
+  }
+
+  @Output() close = new EventEmitter<void>();
+
+  onClose(): void {
+    this.close.emit();
   }
 }

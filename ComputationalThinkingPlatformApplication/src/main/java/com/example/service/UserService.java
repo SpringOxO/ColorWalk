@@ -30,7 +30,8 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public String registerUser(User user) {
+    public Map<String, String> registerUser(User user) {
+        Map<String, String> res = new HashMap<>();
         String status;
         // 用户名唯一性检查
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -38,12 +39,14 @@ public class UserService {
         List<User> userList = userMapper.selectList(queryWrapper);
         if (!userList.isEmpty()) {
             status = "用户已存在";
-            return status;
+            res.put("message", status);
+            return res;
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userMapper.insert(user);
-        return "注册成功";
+        res.put("message", "success");
+        return res;
     }
 
     public User findByUsername(String username) {
