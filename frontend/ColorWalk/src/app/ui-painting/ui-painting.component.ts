@@ -5,6 +5,9 @@ import { Subscription } from 'rxjs';
 import { PaletteColorService } from '../palette-color.service';
 import { color } from 'three/examples/jsm/nodes/Nodes.js';
 import { ZonePassService } from '../zone-pass.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { AiChatComponent } from '../ai-chat/ai-chat.component';
 
 interface ColorDrop {
   idx: number;
@@ -14,7 +17,7 @@ interface ColorDrop {
 }
 
 @Component({
-  imports: [UiPaintingComponent,MatCardModule,CommonModule],
+  imports: [UiPaintingComponent,MatCardModule,CommonModule,MatButtonModule],
   selector: 'app-ui-painting',
   templateUrl: './ui-painting.component.html',
   styleUrls: ['./ui-painting.component.scss'],
@@ -26,7 +29,7 @@ export class UiPaintingComponent {
 
   currentZonePassNumber : number = 0;
 
-  constructor(private paletteColorService: PaletteColorService, private zonePassService : ZonePassService) {console.log('###');}
+  constructor(private paletteColorService: PaletteColorService, private zonePassService : ZonePassService,private dialog: MatDialog) {console.log('###');}
 
   colorDrops: ColorDrop[] = [  // 使用接口定义数组
     // { idx: 0, color: '#3254ff', selected: false, passed: false },
@@ -90,5 +93,16 @@ export class UiPaintingComponent {
 
   onClose(): void {
     this.close.emit();
+  }
+  onOpenAI(): void {
+    const dialogRef = this.dialog.open(AiChatComponent, {
+      //width: '1200px',
+      //data: { /* 可选：传递给对话框组件的数据 */ }
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      // 处理对话框关闭后的逻辑
+    });
   }
 }

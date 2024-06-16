@@ -41,11 +41,12 @@
   position: fixed;
   top: 5vh;
   left: 0;
-  bottom: 5vh;
+  /* bottom: 5vh; */
   display: flex;
   justify-content: center;
   align-items: center;
   width: 700px; /* 根据需要调整宽度 */
+  height: fit-content;
   background-color: white;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   z-index: 999;

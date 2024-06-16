@@ -10,7 +10,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 460px; /* 根据需要调整高度 */
+    height: 70%; /* 根据需要调整高度 */
   }
 
 .large-teardrop,
@@ -24,7 +24,7 @@
 
 .color-selections {
     position: absolute;
-    top: 50%; /* 调整垂直位置 */
+    top: 53%; /* 调整垂直位置 */
     left: 50%; /* 调整水平位置 */
     transform: translate(-50%, -50%);
     z-index: 2;
@@ -85,4 +85,10 @@
 
 .teardrop.selected {
     border: 2px solid #fff;
+}
+
+.ai-button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
