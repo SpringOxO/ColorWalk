@@ -21,22 +21,17 @@ export class Zone {
         this.loadDecorationModel();
     }
 
-    loadCorridorModel(): void{
-        
-    }
+    loadCorridorModel(): void{}
 
-    loadAirWall(): void{
-    }
+    loadAirWall(): void{}
 
-    loadPainting(): void{
+    loadPainting(): void{}
 
-    }
+    zonePass(): void {this.world.airWalls.pop();}
 
-    loadDecorationModel(): void{
-    }
+    loadDecorationModel(): void{}
 
-    update(): void{
-    }
+    update(): void{}
 }
 
 @Injectable()
@@ -88,6 +83,7 @@ export class Zone1 extends Zone {
             this.world.airWalls.push(gltf.scene);
         });
     }
+
 
     override loadDecorationModel(): void {
         const loader = new GLTFLoader();

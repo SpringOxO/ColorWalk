@@ -4,6 +4,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { Player, PlayerLocal } from './player';
 import { Zone, Zone1, Zone2, Zone3 } from './zone';
+import { ZonePassService } from '../zone-pass.service';
+import { Subscription } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class World implements OnDestroy {
@@ -26,8 +28,18 @@ export class World implements OnDestroy {
 
   public airWalls : THREE.Group<THREE.Object3DEventMap> [] = [];
 
-  public constructor(private ngZone: NgZone) {
+  currentZonePassNumber : number = 0;
+  preZonePassNumber : number = 0;
+
+  private subscription!: Subscription;
+
+  public constructor(private ngZone: NgZone, private zonePassService : ZonePassService) {
+    this.subscription = this.zonePassService.zoneNumber.subscribe(zoneNumber => {
+      // console.log(zoneNumber);
+      this.currentZonePassNumber = zoneNumber;
+    });
   }
+
 
   public ngOnDestroy(): void {
     if (this.renderer != null) {
@@ -67,7 +79,7 @@ export class World implements OnDestroy {
     //加载第一个区域
     const zone1 : Zone1 = new Zone1(this, new THREE.Vector3(0, 0, 0));
     this.zones.push(zone1);
-    this.initZone2();
+    // this.initZone2();
   }
 
   initZone2 (){
@@ -75,7 +87,7 @@ export class World implements OnDestroy {
     // const zone2 : Zone2 = new Zone2(this, new THREE.Vector3(0, 0, -24));
     this.zones.push(zone2);
 
-    this.initZone3();
+    // this.initZone3();
   }
 
   initZone3 (){
@@ -141,6 +153,21 @@ export class World implements OnDestroy {
   }
 
   public render(): void {
+    if (this.currentZonePassNumber != this.preZonePassNumber){
+      this.zones[this.zones.length - 1].zonePass();
+      switch (this.preZonePassNumber){
+        case 0:
+          this.initZone2();
+          break;
+        case 1:
+          this.initZone3();
+          break;
+        default:
+          break;
+      }
+      this.preZonePassNumber = this.currentZonePassNumber;
+    }
+    
     requestAnimationFrame(() => {
       this.render();
     });

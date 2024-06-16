@@ -8,7 +8,7 @@
     </button>
 </div>
 
-<div class="painting-container" *ngIf="showPainting">
+<div class="painting-container" [ngStyle]="{'display' : showPainting? 'block' : 'none'}">
     <app-ui-painting (close)="onClosePainting()" style="top: 30%;"></app-ui-painting>
 </div>
 
