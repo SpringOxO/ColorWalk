@@ -46,13 +46,27 @@ export class AppComponent {
     this.showPainting = false;
   }
 
+  isLoggedIn(): boolean {
+    return this.authService.isLoggedIn();
+  }
+
   jumpToLogin(): void {
-    if(!this.authService.isLoggedIn){
+    if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login']);
-    }else{
-      
+    } else {
+      this.authService.logout();
+      // 可选：登出后重定向到其他页面
+      this.router.navigate(['/login']);
     }
     
+  }
+
+  jumpToGallery(): void{
+    this.router.navigate(['/world']);
+  }
+
+  jumpToWhiteWorld(): void{
+    this.router.navigate(['/whiteworld']);
   }
 
   @HostListener('document:keydown', ['$event'])

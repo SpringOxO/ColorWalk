@@ -1,13 +1,15 @@
-
-
 <div class="app-container" style="height: 0%;">
-    <button mat-button (click)="onOpenPainting()">Open Painting UI</button>
-    <button mat-button (click)="jumpToLogin()">Log in</button>
+    <button mat-button (click)="jumpToGallery()">Gallery</button>
+    <button mat-button (click)="jumpToWhiteWorld()">FreePainting</button>
+    <button mat-button (click)="jumpToLogin()">
+        <span *ngIf="!isLoggedIn()">Log in</span>
+        <span *ngIf="isLoggedIn()">Log out</span>
+    </button>
 </div>
 
 <div class="painting-container" *ngIf="showPainting">
     <app-ui-painting (close)="onClosePainting()" style="top: 30%;"></app-ui-painting>
-  </div>
+</div>
 
 
 <!-- <app-world></app-world> -->
