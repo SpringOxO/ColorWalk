@@ -133,6 +133,7 @@ export class World implements OnDestroy {
       this.camera.position.z - 30
     );
     this.camera.lookAt(lookPosition);
+    
   }
   
 
@@ -185,17 +186,34 @@ export class World implements OnDestroy {
     this.renderer.render(this.scene, this.camera);
   }
 
+  // public resize(): void {
+  //   console.log("resized");
+  //   const width = window.innerWidth;
+  //   const height = window.innerHeight;
+
+  //   this.camera.left = -width / 2;
+  //   this.camera.right = width / 2;
+  //   this.camera.top = height / 2;
+  //   this.camera.bottom = -height / 2;
+  //   this.camera.updateProjectionMatrix();
+
+  //   this.renderer.setSize(width, height);
+  // }
   public resize(): void {
     console.log("resized");
     const width = window.innerWidth;
     const height = window.innerHeight;
-
-    this.camera.left = -width / 2;
-    this.camera.right = width / 2;
-    this.camera.top = height / 2;
-    this.camera.bottom = -height / 2;
+  
+    const aspect = width / height;
+    const frustumSize = 10;
+  
+    this.camera.left = frustumSize * aspect / -this.scene_scale;
+    this.camera.right = frustumSize * aspect / this.scene_scale;
+    this.camera.top = frustumSize / this.scene_scale;
+    this.camera.bottom = frustumSize / -this.scene_scale;
     this.camera.updateProjectionMatrix();
-
+  
     this.renderer.setSize(width, height);
   }
+
 }
