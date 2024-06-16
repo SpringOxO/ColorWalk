@@ -9,7 +9,7 @@
 </div>
 
 <div class="painting-container" [ngStyle]="{'display' : showPainting? 'block' : 'none'}">
-    <app-ui-painting (close)="onClosePainting()" ></app-ui-painting>
+    <app-ui-painting (close)="onClosePainting()" (hide) = "onHidePainting()" ></app-ui-painting>
 </div>
 
 

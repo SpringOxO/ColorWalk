@@ -178,6 +178,32 @@ export class Zone2 extends Zone {
         });
     }
 
+    override loadPainting(): void {
+        const loader = new GLTFLoader();
+        loader.load('assets/models/painting_2.glb', (gltf) => {
+            gltf.scene.traverse((child) => {
+                if (child instanceof THREE.Mesh) { //设置全透明
+                    const material = child.material;
+                    material.transparent = true;
+                    material.opacity = 0;
+                    this.corridorMaterials.push(material);
+                }
+            });
+
+            this.world.scene.add(gltf.scene);
+            const pos = this.endV.clone().add(new THREE.Vector3(0, 2, 0));
+            gltf.scene.position.set(pos.x, pos.y, pos.z);
+        });
+        
+        loader.load('assets/models/airwall_unit.glb', (gltf) => {
+            this.world.scene.add(gltf.scene);
+            const pos = this.endV.clone();
+            gltf.scene.position.set(pos.x, pos.y, pos.z);
+            gltf.scene.visible = false;
+            this.world.airWalls.push(gltf.scene);
+        });
+    }
+
     loadLineYModel(modelPath: string, v: THREE.Vector3){
         v.x += 1.2;
         v.z -= 0.9;

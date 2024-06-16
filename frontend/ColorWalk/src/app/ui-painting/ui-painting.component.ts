@@ -24,6 +24,8 @@ interface ColorDrop {
   standalone: true
 })
 export class UiPaintingComponent {
+  imgPath : string = "./assets/pictures/RYB.jpg";
+
   currentColor : string | null = '#000000';  // 默认颜色
   private subscription!: Subscription;
 
@@ -32,8 +34,8 @@ export class UiPaintingComponent {
   constructor(private paletteColorService: PaletteColorService, private zonePassService : ZonePassService,private dialog: MatDialog) {console.log('###');}
 
   colorDrops: ColorDrop[] = [  // 使用接口定义数组
-    // { idx: 0, color: '#3254ff', selected: false, passed: false },
-    // { idx: 1, color: '#e84040', selected: false, passed: false },
+    { idx: 0, color: '#3254ff', selected: false, passed: false },
+    { idx: 1, color: '#e84040', selected: false, passed: false },
     { idx: 2, color: '#f0b11e', selected: false, passed: false }
   ];
 
@@ -68,8 +70,8 @@ export class UiPaintingComponent {
         drop.passed = true;
       }
       
-      console.log(currentRGB);
-      console.log(dropRGB);
+      // console.log(currentRGB);
+      // console.log(dropRGB);
       console.log(drop.passed);
     }
   
@@ -77,9 +79,29 @@ export class UiPaintingComponent {
       console.log('zone pass!');
       this.currentZonePassNumber++;
       this.zonePassService.passZone(this.currentZonePassNumber);
+
+      this.updatePainting();
     }
-    console.log('!');
-    console.log(this.colorDrops);
+    // console.log('!');
+    // console.log(this.colorDrops);
+  }
+
+  updatePainting(){
+    this.onHide();
+    switch(this.currentZonePassNumber){
+      case 1:
+        {
+          this.imgPath = "./assets/pictures/Sunday.jpg"
+          this.colorDrops = [
+            { idx: 0, color: '#bbb96c', selected: false, passed: false },
+            { idx: 1, color: '#d06c42', selected: false, passed: false },
+            { idx: 2, color: '#8f94c3', selected: false, passed: false }
+          ];
+        }
+        break;
+      default:
+        break;
+    }
   }
 
   hexToRGB(hex: string): number[] {
@@ -91,9 +113,16 @@ export class UiPaintingComponent {
 
   @Output() close = new EventEmitter<void>();
 
+  @Output() hide = new EventEmitter<void>();
+
   onClose(): void {
     this.close.emit();
   }
+
+  onHide(): void {
+    this.hide.emit();
+  }
+
   onOpenAI(): void {
     const dialogRef = this.dialog.open(AiChatComponent, {
       //width: '1200px',

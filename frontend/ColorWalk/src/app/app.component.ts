@@ -46,6 +46,11 @@ export class AppComponent {
     this.showPainting = false;
   }
 
+  onHidePainting(): void {
+    console.log("hide ui-painting");
+    this.showPainting = false;
+  }
+
   isLoggedIn(): boolean {
     return this.authService.isLoggedIn();
   }
