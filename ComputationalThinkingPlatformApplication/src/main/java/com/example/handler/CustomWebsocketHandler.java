@@ -1,6 +1,7 @@
 package com.example.handler;
 
 import com.example.model.UserData;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -8,6 +9,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -63,6 +65,9 @@ public class CustomWebsocketHandler extends TextWebSocketHandler {
                 break;
             case "updateZone":
                 handleUpdateZone(session, data);
+                break;
+            case "getOwnUser":
+                handleGetOwnUser(session);
                 break;
             case "getUserList":
                 handleGetUserList(session);
@@ -135,6 +140,14 @@ public class CustomWebsocketHandler extends TextWebSocketHandler {
             System.out.println("Updated zone_passed for user: " + userId + " to: " + data.get("zone_passed"));
         }
     }
+
+    private void handleGetOwnUser(WebSocketSession session) throws IOException {
+        String userId = sid2uid.get(session.getId());
+        String userData = objectMapper.writeValueAsString(userSessions.get(userId));
+        session.sendMessage(new TextMessage("{\"type\":\"userdata\", \"data\":" + userData + "}"));
+        System.out.println("User list JSON: " + userData);
+    }
+
 
     private void handleGetUserList(WebSocketSession session) {
         try {

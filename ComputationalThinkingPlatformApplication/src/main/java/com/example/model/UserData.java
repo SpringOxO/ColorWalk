@@ -13,7 +13,7 @@ public class UserData {
     private String id;
     @JsonIgnore
     private WebSocketSession session;
-    private int zonePassed;
+    private int zone_passed;
 
     public UserData(double x, double y, double z, String id, WebSocketSession session) {
         this.x = x;
@@ -21,7 +21,7 @@ public class UserData {
         this.z = z;
         this.id = id;
         this.session = session;
-        this.zonePassed = 0; // Default value
+        this.zone_passed = 0; // Default value
     }
 
     // Getters and setters for all fields
@@ -66,15 +66,15 @@ public class UserData {
     }
 
     public int getZonePassed() {
-        return zonePassed;
+        return zone_passed;
     }
 
-    public void setZonePassed(int zonePassed) {
-        this.zonePassed = zonePassed;
+    public void setZonePassed(int zone_passed) {
+        this.zone_passed = zone_passed;
     }
 
     public void incrementZonePassed() {
-        this.zonePassed++;
+        this.zone_passed++;
     }
     // Helper method to convert UserData to Map
     public Map<String, Object> toMap() {
@@ -83,7 +83,7 @@ public class UserData {
         map.put("y", y);
         map.put("z", z);
         map.put("id", id);
-        map.put("zonePassed", zonePassed);
+        map.put("zone_passed", zone_passed);
         return map;
     }
 }
