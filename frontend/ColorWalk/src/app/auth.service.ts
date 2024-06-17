@@ -13,6 +13,16 @@ export class AuthService {
   }
 
   private loggedIn = false;
+  private username = '';
+
+  setUsername(username: string): void{
+    this.username = username;
+    localStorage.setItem('username', username);
+  }
+
+  getUsername(): string{
+    return localStorage.getItem('username') || '';
+  }
 
   isLoggedIn(): boolean {
     return this.loggedIn;
@@ -26,6 +36,7 @@ export class AuthService {
   logout(): void {
     this.loggedIn = false;
     localStorage.removeItem('loggedIn');
+    localStorage.removeItem('username');
   }
 
   register(username: string, password: string): Observable<any> {
@@ -36,4 +47,17 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/login`, { username, password });
   }
 
+  getAllInfo():Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/getuserlist`, {  });
+  }
+
+  getMyInfo(username: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/getownuser`, {
+       username:username 
+    });
+  }
+
+//   updateMyPass(username: string):Observable<any> {
+//     return this.http.post<any>(`${this.apiUrl}/`, {  });
+//   }
 }

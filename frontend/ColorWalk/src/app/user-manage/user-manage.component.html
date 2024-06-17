@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+</head>
+
+<body id="myBody" style="overflow: hidden;">
+    <i *ngFor="let drop of raindrops" [style.width]="drop.width" [style.left]="drop.left"
+        [style.animation-delay]="drop.animationDelay" [style.animation-duration]="drop.animationDuration">
+    </i>
+    <div class="container">
+        
+    </div>
+</body>
+
+</html>

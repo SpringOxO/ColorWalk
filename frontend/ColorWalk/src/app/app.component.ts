@@ -69,8 +69,8 @@ export class AppComponent {
     this.router.navigate(['/whiteworld']);
   }
 
-  jumpToAI(): void{
-    this.router.navigate(['/chat']);
+  jumpToInfo(): void{
+    this.router.navigate(['/info']);
   }
 
   @HostListener('document:keydown', ['$event'])

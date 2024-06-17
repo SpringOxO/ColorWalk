@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import {jwtDecode} from 'jwt-decode';
 
 
 @Component({
@@ -54,7 +55,8 @@ export class LoginComponent implements OnInit {
           console.log('Login successful', response);
           // 处理登录成功（例如，保存 JWT token，重定向等）
           this.authService.log();
-          this.router.navigate(['/whiteworld']); // 假设有一个 dashboard 路由
+          this.authService.setUsername(this.username);
+          this.router.navigate(['/world']); // 假设有一个 dashboard 路由
         }else{
           //弹出提示框：用户名或密码错误
           this.snackBar.open('用户名或密码错误', '关闭', {

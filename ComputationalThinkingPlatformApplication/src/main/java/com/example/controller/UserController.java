@@ -58,7 +58,7 @@ public class UserController {
         return userService.updateUser(user);
     }
 
-    @GetMapping("/getownuser")
+    @PostMapping("/getownuser")
     public User getOwnUser(@RequestBody Map<String, String> map) {
         String username = map.get("username");
         return userService.getOwnUser(username);
