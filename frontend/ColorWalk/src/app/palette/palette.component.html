@@ -1,9 +1,10 @@
 
 <div style="display: flex;">
     <div id="colors" style="margin-left: 0px; margin-top: 5vh; width: 200px;">
-        <div class="col-4" *ngFor="let color of buttonColors;">
-            <button class="singleColor" [style.backgroundColor]="color"
-            (mousedown)="changeColor(color)"(mouseup)="changeColorFinish()"></button>
+        <div class="col-4" *ngFor="let color of buttonColors; let i = index">
+            <button class="singleColor" [style.backgroundColor]="buttonColors[i]" [id]="i"
+            (mousedown)="changeColor($event)"(mouseup)="changeColorFinish()"
+            (contextmenu)="replaceColor($event)"></button>
         </div>
     </div>
     <button class="closeButton" (click)="closePalette()"><mat-icon>close</mat-icon></button>
@@ -14,4 +15,4 @@
         (mousedown)="paletteMouseDown($event)" (mouseup)="paletteMouseUp($event)"
         (mousemove)="paletteMouseMove($event)"></canvas>
     </div>
-</div>
+</div> 

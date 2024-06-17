@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { PaletteColorService } from '../palette-color.service';
 import { PaletteCloseService } from '../palette-close.service';
+import { ColorService } from '../color.service';
 
 @Component({
   selector: 'app-palette',
@@ -16,6 +17,7 @@ export class PaletteComponent implements AfterViewChecked {
   private ctx !: CanvasRenderingContext2D;
   private pickedColor = '#ff0000';
   private currentColor = '#ffffff';
+  private eyeDropColor = '#ffffff';
   private colorAmount = 0;
   private maxColorAmount = 10;
   buttonColors: string[] = ['#ffff00', '#ff00ff', '#00ffff', '#000000', '#ffffff', '#ffffff', '#ffffff'];
@@ -26,6 +28,7 @@ export class PaletteComponent implements AfterViewChecked {
   startDragging: boolean = false;
 
   colorLongClick: boolean = false;
+  colorLeftClick: boolean = false;
   colorPressTimer: any;
   colorIntervalTimer: any;
 
@@ -38,7 +41,18 @@ export class PaletteComponent implements AfterViewChecked {
     border: '1px solid black'
   };
 
-  constructor(private paletteColorService: PaletteColorService, private paletteCloseService: PaletteCloseService) { }
+  constructor(private paletteColorService: PaletteColorService, private paletteCloseService: PaletteCloseService,
+    private colorService: ColorService) { }
+  
+  ngOnInit() {
+    this.colorService.currentColor.subscribe(color => {
+      const eyeDropperColor = color;
+      if (eyeDropperColor) {
+        const stringColor = '#' + eyeDropperColor.toString(16).padStart(6, '0');
+        this.eyeDropColor = stringColor;
+      }
+    });
+  }
 
   ngAfterViewChecked() {
     const canvas = this.canvasRef.nativeElement;
@@ -132,21 +146,29 @@ export class PaletteComponent implements AfterViewChecked {
     this.ctx.putImageData(imageData, x - radius, y - radius);
   }
 
-  changeColor(color: string) {
-    console.log('Change color to ' + color);
-    this.pickedColor = color;
-    this.colorPressTimer = setTimeout(() => {
-      this.colorLongClick = true;
-      this.colorIntervalTimer = setInterval(() => {
-        this.mixColor(color);
-      }, 100);
-    }, 500);
+  changeColor(event: MouseEvent) {
+    if (event.button === 0) {
+      console.log('Change color');
+      const button = event.target as HTMLButtonElement;
+      const buttonId = button.id;
+      const id = parseInt(buttonId);
+      const color = this.buttonColors[id];
+      console.log('Change color to ' + color);
+      this.pickedColor = color;
+      this.colorLeftClick = true;
+      this.colorPressTimer = setTimeout(() => {
+        this.colorLongClick = true;
+        this.colorIntervalTimer = setInterval(() => {
+          this.mixColor(color);
+        }, 100);
+      }, 500);
+    }
   }
 
   changeColorFinish() {
     clearTimeout(this.colorPressTimer);
     clearInterval(this.colorIntervalTimer);
-    if (!this.colorLongClick) {
+    if (!this.colorLongClick && this.colorLeftClick) {
       this.mixColor(this.pickedColor);
     }
     this.colorLongClick = false;
@@ -159,9 +181,10 @@ export class PaletteComponent implements AfterViewChecked {
 
   mixColor(color: string) {
     // this.colorAmount++;
+    console.log('current ' + this.currentColor);
+    console.log('new ' + color);
     const currentRgb = this.hexToRgb(this.currentColor);
     const newRgb = this.hexToRgb(color);
-    console.log(currentRgb);
     if (currentRgb.r === 255 && currentRgb.g === 255 && currentRgb.b === 255) {
       this.currentColor = color;
       this.currentColorDiv['background-color'] = color;
@@ -226,6 +249,9 @@ export class PaletteComponent implements AfterViewChecked {
     this.colorAmount = 0;
     this.currentColor = '#ffffff';
     this.currentColorDiv['background-color'] = this.currentColor;
+    this.buttonColors[0] = '#ffff00';
+    this.buttonColors[1] = '#ff00ff';
+    this.buttonColors[2] = '#00ffff';
     if (this.ctx) {
       this.ctx.fillStyle = 'white'; // 设置画布的填充颜色为白色
       this.ctx.fillRect(0, 0, this.canvasRef.nativeElement.width, this.canvasRef.nativeElement.height); // 填充整个画布
@@ -234,5 +260,19 @@ export class PaletteComponent implements AfterViewChecked {
 
   public closePalette() {
     this.paletteCloseService.closePalette(true);
+  }
+
+  public replaceColor(event: MouseEvent) {
+    event.preventDefault();
+    const button = event.target as HTMLButtonElement;
+    const buttonId = button.id;
+    const id = parseInt(buttonId);
+    if (id >= 0 && id < this.buttonColors.length) {
+      this.buttonColors[id] = this.eyeDropColor;
+      this.pickedColor = this.eyeDropColor;
+      console.log('Replace color to ' + this.pickedColor);
+      this.mixColor(this.pickedColor);
+      this.paletteColorService.changeColor(this.currentColor);
+    }
   }
 }
