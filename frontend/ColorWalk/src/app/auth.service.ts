@@ -57,6 +57,12 @@ export class AuthService {
     });
   }
 
+  increaseZonePassed(username: string): Observable<any>{
+    return this.http.post<any>(`${this.apiUrl}/increment`, {
+       username:username 
+    });
+  }
+
 //   updateMyPass(username: string):Observable<any> {
 //     return this.http.post<any>(`${this.apiUrl}/`, {  });
 //   }

@@ -7,6 +7,7 @@ import { Zone, Zone1, Zone2, Zone3 } from './zone';
 import { ZonePassService } from '../zone-pass.service';
 import { Subscription } from 'rxjs';
 import { PaintingNearService } from '../painting-near.service';
+import { AuthService } from '../auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class World implements OnDestroy {
@@ -34,11 +35,27 @@ export class World implements OnDestroy {
 
   private subscription!: Subscription;
 
-  public constructor(private ngZone: NgZone, private zonePassService : ZonePassService, private paintingNearService: PaintingNearService) {
+  public constructor(private ngZone: NgZone, private zonePassService : ZonePassService, private paintingNearService: PaintingNearService, private authService: AuthService) {
     this.subscription = this.zonePassService.zoneNumber.subscribe(zoneNumber => {
       // console.log(zoneNumber);
       this.currentZonePassNumber = zoneNumber;
     });
+    this.currentZonePassNumber = this.getMyZonePassedNumber();
+  }
+
+  getMyZonePassedNumber() : number {
+    const username = this.authService.getUsername();
+    this.authService.getMyInfo(username).subscribe(
+      response => {
+        console.log(response);
+        return 0;
+      },
+      (error) => {
+        console.error('Error retrieving user:', error);
+        return 0;
+      }
+    );
+    return 0;
   }
 
 

@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { AiChatComponent } from '../ai-chat/ai-chat.component';
 import { PaintingNearService } from '../painting-near.service';
+import { AuthService } from '../auth.service';
 
 interface ColorDrop {
   idx: number;
@@ -33,7 +34,7 @@ export class UiPaintingComponent {
 
   currentZonePassNumber : number = 0;
 
-  constructor(private paletteColorService: PaletteColorService, private zonePassService : ZonePassService,private dialog: MatDialog, private paintingNearService: PaintingNearService) {}
+  constructor(private authService: AuthService, private paletteColorService: PaletteColorService, private zonePassService : ZonePassService,private dialog: MatDialog, private paintingNearService: PaintingNearService) {}
 
   colorDrops: ColorDrop[] = [  // 使用接口定义数组
     { idx: 0, color: '#3254ff', selected: false, passed: false },
@@ -82,10 +83,20 @@ export class UiPaintingComponent {
       console.log(drop.passed);
     }
   
-    if (this.checkPass()) {
+    if (this.checkPass()) { //过关啦！！！
       console.log('zone pass!');
       this.currentZonePassNumber++;
       this.zonePassService.passZone(this.currentZonePassNumber);
+
+      this.authService.increaseZonePassed(this.authService.getUsername()).subscribe(
+        response => {
+          console.log('Update success!');
+        },
+        (error) => {
+          console.error('Error retrieving user:', error);
+        }
+      );
+      // this.authService.increaseZonePassed(this.authService.getUsername());
 
       this.updatePainting();
     }
