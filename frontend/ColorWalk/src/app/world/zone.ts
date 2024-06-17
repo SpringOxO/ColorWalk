@@ -11,7 +11,11 @@ export class Zone {
 
     public corridorModelPath : string = '';
     public airWallPath : string = '';
+    public airWallName : string = '';
+    public airWallUnitName : string = '';
     public endV : THREE.Vector3 = new THREE.Vector3();
+    public passed : boolean = false;
+    public blocked : boolean = true;
 
     constructor(public world: World, public startV : THREE.Vector3) {
         this.endV = startV.clone();
@@ -27,11 +31,26 @@ export class Zone {
 
     loadPainting(): void{}
 
-    zonePass(): void {this.world.airWalls.pop();}
+    zonePass(): void {this.passed = true;} //标记通过，在update时才会移除，这是有些复杂的异步带来的麻烦：有时还没有装载好空气墙就已经要调用zonepass了。
 
     loadDecorationModel(): void{}
 
-    update(): void{}
+    update(): void{
+        if (this.passed && this.blocked){ //如果被标记为通过，但还是blocked，就移除空气墙
+            console.log(this.world.airWalls.length);
+            const airwallToRemove = this.world.airWalls.find(airwall => airwall.name === this.airWallUnitName);
+            if (airwallToRemove) {
+                console.log(airwallToRemove);
+                this.world.scene.remove(airwallToRemove);
+                const index = this.world.airWalls.indexOf(airwallToRemove);
+                if (index !== -1) {
+                    this.world.airWalls.splice(index, 1);
+                }
+                console.log(this.world.airWalls.length);
+                this.blocked = false;
+            }
+        }
+    }
 }
 
 @Injectable()
@@ -58,12 +77,14 @@ export class Zone1 extends Zone {
     }
 
     override loadAirWall(): void {
+        this.airWallName = 'airwall_1';
         this.corridorModelPath = 'assets/models/airwall_1.glb';
         const loader = new GLTFLoader();
         loader.load(this.corridorModelPath, (gltf) => {
             this.world.scene.add(gltf.scene);
             gltf.scene.position.set(this.startV.x, this.startV.y, this.startV.z);
             gltf.scene.visible = false;
+            gltf.scene.name = this.airWallName;
             this.world.airWalls.push(gltf.scene);
         });
     }
@@ -75,11 +96,13 @@ export class Zone1 extends Zone {
             const pos = this.endV.clone().add(new THREE.Vector3(0, 2, 0));
             gltf.scene.position.set(pos.x, pos.y, pos.z);
         });
+        this.airWallUnitName = 'airwall_unit_1';
         loader.load('assets/models/airwall_unit.glb', (gltf) => {
             this.world.scene.add(gltf.scene);
             const pos = this.endV.clone();
             gltf.scene.position.set(pos.x, pos.y, pos.z);
             gltf.scene.visible = false;
+            gltf.scene.name = this.airWallUnitName;
             this.world.airWalls.push(gltf.scene);
         });
     }
@@ -114,6 +137,7 @@ export class Zone1 extends Zone {
     }
 
     override update(): void {
+        super.update();
         const time = this.clock.getElapsedTime();
         const amplitude = 3;
         const frequency = 0.5;
@@ -174,6 +198,35 @@ export class Zone2 extends Zone {
             this.world.scene.add(gltf.scene);
             gltf.scene.position.set(this.startV.x, this.startV.y, this.startV.z);
             gltf.scene.visible = false;
+            gltf.scene.name = this.airWallName;
+            this.world.airWalls.push(gltf.scene);
+        });
+    }
+
+    override loadPainting(): void {
+        const loader = new GLTFLoader();
+        loader.load('assets/models/painting_2.glb', (gltf) => {
+            gltf.scene.traverse((child) => {
+                if (child instanceof THREE.Mesh) { //设置全透明
+                    const material = child.material;
+                    material.transparent = true;
+                    material.opacity = 0;
+                    this.corridorMaterials.push(material);
+                }
+            });
+
+            this.world.scene.add(gltf.scene);
+            const pos = this.endV.clone().add(new THREE.Vector3(0, 2, 0));
+            gltf.scene.position.set(pos.x, pos.y, pos.z);
+        });
+        
+        this.airWallUnitName = 'airwall_unit_2';
+        loader.load('assets/models/airwall_unit.glb', (gltf) => {
+            this.world.scene.add(gltf.scene);
+            const pos = this.endV.clone();
+            gltf.scene.position.set(pos.x, pos.y, pos.z);
+            gltf.scene.visible = false;
+            gltf.scene.name = this.airWallUnitName;
             this.world.airWalls.push(gltf.scene);
         });
     }
@@ -243,6 +296,7 @@ export class Zone2 extends Zone {
     }
 
     override update(): void {
+        super.update();
         const time = this.clock.getElapsedTime();
 
         //随时间让材质变不透明
@@ -317,6 +371,7 @@ export class Zone3 extends Zone {
             this.world.scene.add(gltf.scene);
             gltf.scene.position.set(this.startV.x, this.startV.y, this.startV.z);
             gltf.scene.visible = false;
+            gltf.scene.name = this.airWallName;
             this.world.airWalls.push(gltf.scene);
         });
     }
@@ -361,6 +416,7 @@ export class Zone3 extends Zone {
     }
 
     override update(): void {
+        super.update();
         const time = this.clock.getElapsedTime();
 
         //随时间让材质变不透明

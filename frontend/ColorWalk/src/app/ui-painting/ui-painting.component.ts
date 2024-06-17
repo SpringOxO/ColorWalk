@@ -8,6 +8,7 @@ import { ZonePassService } from '../zone-pass.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { AiChatComponent } from '../ai-chat/ai-chat.component';
+import { PaintingNearService } from '../painting-near.service';
 
 interface ColorDrop {
   idx: number;
@@ -24,16 +25,19 @@ interface ColorDrop {
   standalone: true
 })
 export class UiPaintingComponent {
+  imgPath : string = "./assets/pictures/RYB.jpg";
+
   currentColor : string | null = '#000000';  // 默认颜色
-  private subscription!: Subscription;
+  private paletteSubscription!: Subscription; //同步调色板当前颜色的订阅
+  private paintingNearSubscription!: Subscription; //获取靠近挂画的信号的订阅
 
   currentZonePassNumber : number = 0;
 
-  constructor(private paletteColorService: PaletteColorService, private zonePassService : ZonePassService,private dialog: MatDialog) {console.log('###');}
+  constructor(private paletteColorService: PaletteColorService, private zonePassService : ZonePassService,private dialog: MatDialog, private paintingNearService: PaintingNearService) {}
 
   colorDrops: ColorDrop[] = [  // 使用接口定义数组
-    // { idx: 0, color: '#3254ff', selected: false, passed: false },
-    // { idx: 1, color: '#e84040', selected: false, passed: false },
+    { idx: 0, color: '#3254ff', selected: false, passed: false },
+    { idx: 1, color: '#e84040', selected: false, passed: false },
     { idx: 2, color: '#f0b11e', selected: false, passed: false }
   ];
 
@@ -50,9 +54,14 @@ export class UiPaintingComponent {
   }
 
   public ngOnInit() {
-    this.subscription = this.paletteColorService.currentColor.subscribe(color => {
+    this.paletteSubscription = this.paletteColorService.currentColor.subscribe(color => {
       this.currentColor = color;
     });
+    this.paintingNearSubscription = this.paintingNearService.onEvent().subscribe(() => {
+      // 在这里处理接收到的事件
+      // console.log('near painting!');
+      this.onShow();
+    })
   }
   
   compareColor(drop: ColorDrop) {
@@ -68,8 +77,8 @@ export class UiPaintingComponent {
         drop.passed = true;
       }
       
-      console.log(currentRGB);
-      console.log(dropRGB);
+      // console.log(currentRGB);
+      // console.log(dropRGB);
       console.log(drop.passed);
     }
   
@@ -77,9 +86,29 @@ export class UiPaintingComponent {
       console.log('zone pass!');
       this.currentZonePassNumber++;
       this.zonePassService.passZone(this.currentZonePassNumber);
+
+      this.updatePainting();
     }
-    console.log('!');
-    console.log(this.colorDrops);
+    // console.log('!');
+    // console.log(this.colorDrops);
+  }
+
+  updatePainting(){
+    this.onHide();
+    switch(this.currentZonePassNumber){
+      case 1:
+        {
+          this.imgPath = "./assets/pictures/Sunday.jpg"
+          this.colorDrops = [
+            { idx: 0, color: '#bbb96c', selected: false, passed: false },
+            { idx: 1, color: '#d06c42', selected: false, passed: false },
+            { idx: 2, color: '#8f94c3', selected: false, passed: false }
+          ];
+        }
+        break;
+      default:
+        break;
+    }
   }
 
   hexToRGB(hex: string): number[] {
@@ -91,9 +120,22 @@ export class UiPaintingComponent {
 
   @Output() close = new EventEmitter<void>();
 
+  @Output() hide = new EventEmitter<void>();
+
+  @Output() show = new EventEmitter<void>();
+
   onClose(): void {
     this.close.emit();
   }
+
+  onHide(): void {
+    this.hide.emit();
+  }
+
+  onShow(): void {
+    this.show.emit();
+  }
+
   onOpenAI(): void {
     const dialogRef = this.dialog.open(AiChatComponent, {
       //width: '1200px',
