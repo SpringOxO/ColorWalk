@@ -120,6 +120,14 @@ public class UserService {
         return userMapper.selectList(null);
     }
 
+    public User getOwnUser(String username) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", username);
+        User user = userMapper.selectOne(queryWrapper);
+        return user;
+    }
+
+
     public Map<String, String> deleteUser(String username) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", username);
@@ -139,7 +147,6 @@ public class UserService {
         User existingUser = userMapper.selectOne(queryWrapper);
         Map<String, String> map = new HashMap<>();
         if (existingUser != null) {
-            existingUser.setUsername(user.getUsername());
             existingUser.setEmail(user.getEmail());
             userMapper.updateById(existingUser);
             map.put("message", "成功更新用户信息");
