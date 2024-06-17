@@ -1,6 +1,7 @@
 package com.example.handler;
 
 import com.example.model.UserData;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -8,6 +9,8 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -22,6 +25,7 @@ public class CustomWebsocketHandler extends TextWebSocketHandler {
     private final Map<String, UserData> userSessions = new ConcurrentHashMap<>();
     private final Map<String, Map<String, String>> faceColorMap = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Map<String, String> sid2uid = new HashMap<>();
 
     public CustomWebsocketHandler() {
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
@@ -31,7 +35,7 @@ public class CustomWebsocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         String sessionId = session.getId();
-        UserData userData = new UserData(0, 0, 0,  sessionId, session);
+        UserData userData = new UserData(0, 0, 0, sessionId, session);
         userSessions.put(sessionId, userData);
 
         session.sendMessage(new TextMessage("{\"type\":\"setId\", \"id\":\"" + sessionId + "\"}"));
@@ -56,29 +60,57 @@ public class CustomWebsocketHandler extends TextWebSocketHandler {
             case "colorFace":
                 handleColorFace(session, data);
                 break;
+//            case "incrementZone":
+//                handleIncrementZone(session);
+//                break;
+//            case "updateZone":
+//                handleUpdateZone(session, data);
+//                break;
+//            case "getOwnUser":
+//                handleGetOwnUser(session);
+//                break;
+//            case "getUserList":
+//                handleGetUserList(session);
+//                break;
+//            case "deleteUser":
+//                handleDeleteUser(session, data);
+//                break;
+//            case "updateUser":
+//                handleUpdateUser(session, data);
+//                break;
         }
     }
 
     private void handleInit(WebSocketSession session, Map<String, Object> data) throws Exception {
-        UserData userData = userSessions.get(session.getId());
+        String sessionId = session.getId();
+        String newId = (String) data.get("id");
+        sid2uid.put(sessionId, newId);
+        UserData userData = userSessions.remove(sessionId); // Remove the old entry with sessionId
+
         if (userData != null) {
             userData.setX(doubleValue(data.get("x")) );
             userData.setY(doubleValue(data.get("y")) );
             userData.setZ(doubleValue(data.get("z")) );
-            System.out.println("socket.init " + session.getId() + " with data: " + data);
+            userData.setId(newId);
+
+            userSessions.put(newId, userData); // Add new entry with newId
+
+            System.out.println("socket.init " + sessionId + " with data: " + data);
         }
     }
 
     private void handleUpdate(WebSocketSession session, Map<String, Object> data) {
-        UserData userData = userSessions.get(session.getId());
+        String userId = sid2uid.get(session.getId());
+        UserData userData = userSessions.get(userId);
+
         if (userData != null) {
             userData.setX(doubleValue(data.get("x")) );
             userData.setY(doubleValue(data.get("y")) );
             userData.setZ(doubleValue(data.get("z")) );
-            System.out.println("socket.update " + session.getId() + " with data: " + data);
+
+            System.out.println("user.update " + userId + " with data: " + data);
         }
     }
-
 
     private void handleColorFace(WebSocketSession session, Map<String, Object> data) throws Exception {
         String key = objectMapper.writeValueAsString(data.get("points"));
@@ -90,6 +122,68 @@ public class CustomWebsocketHandler extends TextWebSocketHandler {
         broadcastColorData();
         System.out.println(data.get("points") + " " + data.get("color"));
     }
+
+//    private void handleIncrementZone(WebSocketSession session) {
+//        String userId = sid2uid.get(session.getId());
+//        UserData userData = userSessions.get(userId);
+//        if (userData != null) {
+//            userData.incrementZonePassed();
+//            System.out.println("Incremented zone_passed for user: " + userId);
+//        }
+//    }
+//
+//    private void handleUpdateZone(WebSocketSession session, Map<String, Object> data) {
+//        String userId = sid2uid.get(session.getId());
+//        UserData userData = userSessions.get(userId);
+//        if (userData != null && data.containsKey("zone_passed")) {
+//            userData.setZonePassed((Integer) data.get("zone_passed"));
+//            System.out.println("Updated zone_passed for user: " + userId + " to: " + data.get("zone_passed"));
+//        }
+//    }
+//
+//    private void handleGetOwnUser(WebSocketSession session) throws IOException {
+//        String userId = sid2uid.get(session.getId());
+//        String userData = objectMapper.writeValueAsString(userSessions.get(userId));
+//        session.sendMessage(new TextMessage("{\"type\":\"userdata\", \"data\":" + userData + "}"));
+//        System.out.println("User list JSON: " + userData);
+//    }
+//
+//
+//    private void handleGetUserList(WebSocketSession session) {
+//        try {
+//            System.out.println("User sessions: " + userSessions);
+//            String userList = objectMapper.writeValueAsString(userSessions.values());
+//            System.out.println("User list JSON: " + userList);
+//            session.sendMessage(new TextMessage("{\"type\":\"userList\", \"data\":" + userList + "}"));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    // 删除任意用户和更新任意用户：需要传用户id进来
+//    private void handleDeleteUser(WebSocketSession session, Map<String, Object> data) {
+//        String userId = (String) data.get("id");
+//        if (userSessions.containsKey(userId)) {
+//            userSessions.remove(userId);
+//            broadcastDeletePlayer(userId);
+//            System.out.println("Deleted user: " + userId);
+//        }
+//    }
+//
+//    private void handleUpdateUser(WebSocketSession session, Map<String, Object> data) throws Exception {
+//        String userId = (String) data.get("id");
+//        UserData userData = userSessions.get(userId);
+//        if (userData != null) {
+//            if (data.containsKey("x")) userData.setX(doubleValue(data.get("x")) );
+//            if (data.containsKey("y")) userData.setY(doubleValue(data.get("y")) );
+//            if (data.containsKey("z")) userData.setZ(doubleValue(data.get("z")) );
+//            if (data.containsKey("zone_passed")) userData.setZonePassed((Integer) data.get("zone_passed"));
+//
+//            // Broadcast the updated user data to all connected sessions
+//            broadcastPlayerData();
+//            System.out.println("Updated user data for user: " + userId + " with data: " + data);
+//        }
+//    }
 
     private void broadcastPlayerData() {
         try {
@@ -126,7 +220,6 @@ public class CustomWebsocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        System.out.println("socket.closed " + session.getId());
         userSessions.remove(session.getId());
         broadcastDeletePlayer(session.getId());
     }
