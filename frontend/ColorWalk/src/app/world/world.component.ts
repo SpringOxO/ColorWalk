@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, HostListener, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { World } from './world.service';
 
 @Component({
@@ -10,7 +10,7 @@ import { World } from './world.service';
   templateUrl: './world.component.html',
   styleUrl: './world.component.css'
 })
-export class WorldComponent {
+export class WorldComponent implements OnDestroy {
   @ViewChild('rendererCanvas', {static: true})
   public rendererCanvas!: ElementRef<HTMLCanvasElement>;
 
@@ -18,7 +18,13 @@ export class WorldComponent {
   }
 
   public ngOnInit(): void {
+    // this.world = new World();
     this.world.createScene(this.rendererCanvas);
     this.world.animate();
+  }
+
+  ngOnDestroy(): void {
+    console.log("!");
+    this.world.ngOnDestroy();
   }
 }

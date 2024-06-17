@@ -35,6 +35,8 @@ export class World implements OnDestroy {
 
   private subscription!: Subscription;
 
+  requestID : number = 0; //动画id
+
   public constructor(private ngZone: NgZone, private zonePassService : ZonePassService, private paintingNearService: PaintingNearService, private authService: AuthService) {
     this.subscription = this.zonePassService.zoneNumber.subscribe(zoneNumber => {
       // console.log(zoneNumber);
@@ -60,10 +62,51 @@ export class World implements OnDestroy {
 
 
   public ngOnDestroy(): void {
-    if (this.renderer != null) {
+    if (this.renderer) {
+      // 停止动画循环
+      cancelAnimationFrame(this.requestID);
+  
+      // 销毁控制器
+      // this.controls.dispose();
+  
+      // // 销毁区域
+      // this.zones.forEach((zone) => {
+      //   zone.dispose();
+      // });
+      this.zones = [];
+  
+      // 销毁空气墙
+      this.airWalls.forEach((airWall) => {
+        this.scene.remove(airWall);
+      });
+      this.airWalls = [];
+  
+      // // 销毁玩家
+      // if (this.player) {
+      //   this.player.dispose();
+      //   this.player = null!;
+      // }
+  
+      // 销毁光源
+      this.scene.remove(this.light);
+  
+      // 销毁场景中的其他对象
+      while (this.scene.children.length > 0) {
+        this.scene.remove(this.scene.children[0]);
+      }
+  
+      // 销毁渲染器
       this.renderer.dispose();
       this.renderer = null!;
-      this.canvas = null!;
+  
+      // 清空场景
+      this.scene = null!;
+      this.camera = null!;
+  
+      // 取消订阅
+      if (this.subscription) {
+        this.subscription.unsubscribe();
+      }
     }
   }
 
@@ -203,7 +246,7 @@ export class World implements OnDestroy {
       this.preZonePassNumber ++;
     }
 
-    requestAnimationFrame(() => {
+    this.requestID = requestAnimationFrame(() => {
       this.render();
     });
 
