@@ -25,7 +25,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable() // 禁用CSRF保护，仅在必要时禁用
                 .authorizeRequests()
-                .antMatchers("/api/users/register", "/api/users/login", "/ws").permitAll() // 允许未认证用户访问注册和登录端点
+                .antMatchers("/api/users/register", "/api/users/login", "/ws", "/api/users/getuserlist"
+                ,"/api/users/increment","/api/users/delete","/api/users/update","/api/users/updatezone"
+                ).permitAll() // 允许未认证用户访问注册和登录端点
                 .anyRequest().authenticated() // 其他请求需要认证
                 .and()
                 .formLogin()

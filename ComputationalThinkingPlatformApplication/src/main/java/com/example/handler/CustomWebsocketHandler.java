@@ -60,24 +60,24 @@ public class CustomWebsocketHandler extends TextWebSocketHandler {
             case "colorFace":
                 handleColorFace(session, data);
                 break;
-            case "incrementZone":
-                handleIncrementZone(session);
-                break;
-            case "updateZone":
-                handleUpdateZone(session, data);
-                break;
-            case "getOwnUser":
-                handleGetOwnUser(session);
-                break;
-            case "getUserList":
-                handleGetUserList(session);
-                break;
-            case "deleteUser":
-                handleDeleteUser(session, data);
-                break;
-            case "updateUser":
-                handleUpdateUser(session, data);
-                break;
+//            case "incrementZone":
+//                handleIncrementZone(session);
+//                break;
+//            case "updateZone":
+//                handleUpdateZone(session, data);
+//                break;
+//            case "getOwnUser":
+//                handleGetOwnUser(session);
+//                break;
+//            case "getUserList":
+//                handleGetUserList(session);
+//                break;
+//            case "deleteUser":
+//                handleDeleteUser(session, data);
+//                break;
+//            case "updateUser":
+//                handleUpdateUser(session, data);
+//                break;
         }
     }
 
@@ -123,67 +123,67 @@ public class CustomWebsocketHandler extends TextWebSocketHandler {
         System.out.println(data.get("points") + " " + data.get("color"));
     }
 
-    private void handleIncrementZone(WebSocketSession session) {
-        String userId = sid2uid.get(session.getId());
-        UserData userData = userSessions.get(userId);
-        if (userData != null) {
-            userData.incrementZonePassed();
-            System.out.println("Incremented zone_passed for user: " + userId);
-        }
-    }
-
-    private void handleUpdateZone(WebSocketSession session, Map<String, Object> data) {
-        String userId = sid2uid.get(session.getId());
-        UserData userData = userSessions.get(userId);
-        if (userData != null && data.containsKey("zone_passed")) {
-            userData.setZonePassed((Integer) data.get("zone_passed"));
-            System.out.println("Updated zone_passed for user: " + userId + " to: " + data.get("zone_passed"));
-        }
-    }
-
-    private void handleGetOwnUser(WebSocketSession session) throws IOException {
-        String userId = sid2uid.get(session.getId());
-        String userData = objectMapper.writeValueAsString(userSessions.get(userId));
-        session.sendMessage(new TextMessage("{\"type\":\"userdata\", \"data\":" + userData + "}"));
-        System.out.println("User list JSON: " + userData);
-    }
-
-
-    private void handleGetUserList(WebSocketSession session) {
-        try {
-            System.out.println("User sessions: " + userSessions);
-            String userList = objectMapper.writeValueAsString(userSessions.values());
-            System.out.println("User list JSON: " + userList);
-            session.sendMessage(new TextMessage("{\"type\":\"userList\", \"data\":" + userList + "}"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    // 删除任意用户和更新任意用户：需要传用户id进来
-    private void handleDeleteUser(WebSocketSession session, Map<String, Object> data) {
-        String userId = (String) data.get("id");
-        if (userSessions.containsKey(userId)) {
-            userSessions.remove(userId);
-            broadcastDeletePlayer(userId);
-            System.out.println("Deleted user: " + userId);
-        }
-    }
-
-    private void handleUpdateUser(WebSocketSession session, Map<String, Object> data) throws Exception {
-        String userId = (String) data.get("id");
-        UserData userData = userSessions.get(userId);
-        if (userData != null) {
-            if (data.containsKey("x")) userData.setX(doubleValue(data.get("x")) );
-            if (data.containsKey("y")) userData.setY(doubleValue(data.get("y")) );
-            if (data.containsKey("z")) userData.setZ(doubleValue(data.get("z")) );
-            if (data.containsKey("zone_passed")) userData.setZonePassed((Integer) data.get("zone_passed"));
-
-            // Broadcast the updated user data to all connected sessions
-            broadcastPlayerData();
-            System.out.println("Updated user data for user: " + userId + " with data: " + data);
-        }
-    }
+//    private void handleIncrementZone(WebSocketSession session) {
+//        String userId = sid2uid.get(session.getId());
+//        UserData userData = userSessions.get(userId);
+//        if (userData != null) {
+//            userData.incrementZonePassed();
+//            System.out.println("Incremented zone_passed for user: " + userId);
+//        }
+//    }
+//
+//    private void handleUpdateZone(WebSocketSession session, Map<String, Object> data) {
+//        String userId = sid2uid.get(session.getId());
+//        UserData userData = userSessions.get(userId);
+//        if (userData != null && data.containsKey("zone_passed")) {
+//            userData.setZonePassed((Integer) data.get("zone_passed"));
+//            System.out.println("Updated zone_passed for user: " + userId + " to: " + data.get("zone_passed"));
+//        }
+//    }
+//
+//    private void handleGetOwnUser(WebSocketSession session) throws IOException {
+//        String userId = sid2uid.get(session.getId());
+//        String userData = objectMapper.writeValueAsString(userSessions.get(userId));
+//        session.sendMessage(new TextMessage("{\"type\":\"userdata\", \"data\":" + userData + "}"));
+//        System.out.println("User list JSON: " + userData);
+//    }
+//
+//
+//    private void handleGetUserList(WebSocketSession session) {
+//        try {
+//            System.out.println("User sessions: " + userSessions);
+//            String userList = objectMapper.writeValueAsString(userSessions.values());
+//            System.out.println("User list JSON: " + userList);
+//            session.sendMessage(new TextMessage("{\"type\":\"userList\", \"data\":" + userList + "}"));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    // 删除任意用户和更新任意用户：需要传用户id进来
+//    private void handleDeleteUser(WebSocketSession session, Map<String, Object> data) {
+//        String userId = (String) data.get("id");
+//        if (userSessions.containsKey(userId)) {
+//            userSessions.remove(userId);
+//            broadcastDeletePlayer(userId);
+//            System.out.println("Deleted user: " + userId);
+//        }
+//    }
+//
+//    private void handleUpdateUser(WebSocketSession session, Map<String, Object> data) throws Exception {
+//        String userId = (String) data.get("id");
+//        UserData userData = userSessions.get(userId);
+//        if (userData != null) {
+//            if (data.containsKey("x")) userData.setX(doubleValue(data.get("x")) );
+//            if (data.containsKey("y")) userData.setY(doubleValue(data.get("y")) );
+//            if (data.containsKey("z")) userData.setZ(doubleValue(data.get("z")) );
+//            if (data.containsKey("zone_passed")) userData.setZonePassed((Integer) data.get("zone_passed"));
+//
+//            // Broadcast the updated user data to all connected sessions
+//            broadcastPlayerData();
+//            System.out.println("Updated user data for user: " + userId + " with data: " + data);
+//        }
+//    }
 
     private void broadcastPlayerData() {
         try {

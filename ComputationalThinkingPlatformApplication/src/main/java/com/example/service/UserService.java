@@ -11,9 +11,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +71,80 @@ public class UserService {
         } catch (AuthenticationException e) {
             System.out.println("Login failed: " + e.getMessage());
             map.put("message", e.getMessage());
+        }
+        return map;
+    }
+
+    public Map<String, String> handleUpdateZone(String username, Integer zone_passed) {
+//        UsernamePasswordAuthenticationToken authentication =
+//                (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+//
+//        UserDetailsImpl loginUser = (UserDetailsImpl) authentication.getPrincipal();
+//        User user = loginUser.getUser();
+
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", username);
+        User user = userMapper.selectOne(queryWrapper);
+
+        user.setZone_passed(zone_passed);
+        userMapper.updateById(user);
+        Map<String, String> map = new HashMap<>();
+        map.put("message", "成功修改用户" + user.getUsername() + "的zone_passed为 " + zone_passed);
+        return map;
+    }
+
+    public Map<String, String> incrementZonePassed(String username) {
+//        UsernamePasswordAuthenticationToken authentication =
+//                (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+//
+//        UserDetailsImpl loginUser = (UserDetailsImpl) authentication.getPrincipal();
+//        User user = loginUser.getUser();
+
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", username);
+        User user = userMapper.selectOne(queryWrapper);
+        if (user != null) {
+            user.setZone_passed(user.getZone_passed() + 1);
+            userMapper.updateById(user);
+            Map<String, String> map = new HashMap<>();
+            map.put("message", "成功将用户" + user.getUsername() + "的zone_passed自增1");
+            return map;
+        } else {
+            Map<String, String> map = new HashMap<>();
+            map.put("message", "用户不存在");
+            return map;
+        }
+    }
+
+    public List<User> getUserList() {
+        return userMapper.selectList(null);
+    }
+
+    public Map<String, String> deleteUser(String username) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", username);
+        int deletedRows = userMapper.delete(queryWrapper);
+        Map<String, String> map = new HashMap<>();
+        if (deletedRows > 0) {
+            map.put("message", "成功删除用户" + username);
+        } else {
+            map.put("message", "用户不存在");
+        }
+        return map;
+    }
+
+    public Map<String, String> updateUser(User user) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", user.getUsername());
+        User existingUser = userMapper.selectOne(queryWrapper);
+        Map<String, String> map = new HashMap<>();
+        if (existingUser != null) {
+            existingUser.setUsername(user.getUsername());
+            existingUser.setEmail(user.getEmail());
+            userMapper.updateById(existingUser);
+            map.put("message", "成功更新用户信息");
+        } else {
+            map.put("message", "用户不存在");
         }
         return map;
     }
