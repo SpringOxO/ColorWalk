@@ -8,7 +8,7 @@ import { AiChatComponent } from './ai-chat/ai-chat.component';
 
 
 export const routes: Routes = [
-    {path: '', component: WorldComponent},
+    {path: '', component: WorldComponent, canActivate: [AuthGuard] },
     {path: 'login', component: LoginComponent},
     { path: 'world', component: WorldComponent, canActivate: [AuthGuard] },
     { path: 'whiteworld', component: WhiteWorldComponent, canActivate: [AuthGuard] },

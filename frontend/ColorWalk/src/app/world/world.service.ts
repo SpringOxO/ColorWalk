@@ -1,4 +1,4 @@
-import { ElementRef, Injectable, NgZone, OnDestroy } from '@angular/core';
+import { ElementRef, Injectable, NgZone, OnDestroy, Output } from '@angular/core';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -6,6 +6,7 @@ import { Player, PlayerLocal } from './player';
 import { Zone, Zone1, Zone2, Zone3 } from './zone';
 import { ZonePassService } from '../zone-pass.service';
 import { Subscription } from 'rxjs';
+import { PaintingNearService } from '../painting-near.service';
 
 @Injectable({ providedIn: 'root' })
 export class World implements OnDestroy {
@@ -33,7 +34,7 @@ export class World implements OnDestroy {
 
   private subscription!: Subscription;
 
-  public constructor(private ngZone: NgZone, private zonePassService : ZonePassService) {
+  public constructor(private ngZone: NgZone, private zonePassService : ZonePassService, private paintingNearService: PaintingNearService) {
     this.subscription = this.zonePassService.zoneNumber.subscribe(zoneNumber => {
       // console.log(zoneNumber);
       this.currentZonePassNumber = zoneNumber;
@@ -50,6 +51,7 @@ export class World implements OnDestroy {
   }
 
   public createScene(canvas: ElementRef<HTMLCanvasElement>): void {
+    this.zones = [];
     this.canvas = canvas.nativeElement;
 
     this.renderer = new THREE.WebGLRenderer({
@@ -77,6 +79,7 @@ export class World implements OnDestroy {
 
   initZone1 (){
     //加载第一个区域
+    this.preZonePassNumber = 0;
     const zone1 : Zone1 = new Zone1(this, new THREE.Vector3(0, 0, 0));
     this.zones.push(zone1);
     // this.initZone2();
@@ -94,6 +97,19 @@ export class World implements OnDestroy {
     const zone3 : Zone3 = new Zone3(this, this.zones[this.zones.length - 1].endV.clone());
     // const zone2 : Zone2 = new Zone2(this, new THREE.Vector3(0, 0, -24));
     this.zones.push(zone3);
+  }
+
+  checkNearPosition (position1 : THREE.Vector3, position2 : THREE.Vector3): boolean{
+    return Math.abs(position1.x - position2.x) < 1 && Math.abs(position1.y - position2.y) < 1 && Math.abs(position1.z - position2.z) < 1;
+  }
+
+  checkPlayerNearLastPainting() : boolean{
+    // console.log(this.zones[this.zones.length - 1].endV.clone().sub(new THREE.Vector3(0, 0, 1)));
+    return this.checkNearPosition(this.player.model.position, this.zones[this.zones.length - 1].endV.clone().add(new THREE.Vector3(0, 0, 2)));
+  }
+
+  onNearPainting(){
+    this.paintingNearService.emitEvent();
   }
 
   createCamera() { //在用户初始化时被调用
@@ -154,7 +170,8 @@ export class World implements OnDestroy {
   }
 
   public render(): void {
-    if (this.currentZonePassNumber != this.preZonePassNumber){
+    while (this.currentZonePassNumber != this.preZonePassNumber){ //有区域应该解锁
+      console.log(this.zones.length);
       this.zones[this.zones.length - 1].zonePass();
       switch (this.preZonePassNumber){
         case 0:
@@ -166,9 +183,9 @@ export class World implements OnDestroy {
         default:
           break;
       }
-      this.preZonePassNumber = this.currentZonePassNumber;
+      this.preZonePassNumber ++;
     }
-    
+
     requestAnimationFrame(() => {
       this.render();
     });
@@ -177,6 +194,11 @@ export class World implements OnDestroy {
     if (this.player) { //更新用户位置，并让相机跟随
       this.player.update();
       this.cameraFollow();
+    }
+
+    if (this.checkPlayerNearLastPainting()){ // 当靠近画时，发送靠近画信号
+      this.onNearPainting();
+      // console.log(this.currentZonePassNumber);
     }
 
     this.zones.forEach((zone) => {
