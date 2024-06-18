@@ -77,14 +77,14 @@ export class Zone1 extends Zone {
     }
 
     override loadAirWall(): void {
-        this.airWallName = 'airwall_1';
+        // this.airWallName = 'airwall_1';
         this.corridorModelPath = 'assets/models/airwall_1.glb';
         const loader = new GLTFLoader();
         loader.load(this.corridorModelPath, (gltf) => {
             this.world.scene.add(gltf.scene);
             gltf.scene.position.set(this.startV.x, this.startV.y, this.startV.z);
             gltf.scene.visible = false;
-            gltf.scene.name = this.airWallName;
+            // gltf.scene.name = this.airWallName;
             this.world.airWalls.push(gltf.scene);
         });
     }
@@ -198,7 +198,7 @@ export class Zone2 extends Zone {
             this.world.scene.add(gltf.scene);
             gltf.scene.position.set(this.startV.x, this.startV.y, this.startV.z);
             gltf.scene.visible = false;
-            gltf.scene.name = this.airWallName;
+            // gltf.scene.name = this.airWallName;
             this.world.airWalls.push(gltf.scene);
         });
     }
@@ -371,7 +371,7 @@ export class Zone3 extends Zone {
             this.world.scene.add(gltf.scene);
             gltf.scene.position.set(this.startV.x, this.startV.y, this.startV.z);
             gltf.scene.visible = false;
-            gltf.scene.name = this.airWallName;
+            // gltf.scene.name = this.airWallName;
             this.world.airWalls.push(gltf.scene);
         });
     }
