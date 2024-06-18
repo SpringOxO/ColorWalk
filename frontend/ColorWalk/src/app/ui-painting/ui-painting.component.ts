@@ -98,8 +98,9 @@ export class UiPaintingComponent {
     if (this.checkPass()) { //过关啦！！！
       console.log('zone pass!');
       this.currentZonePassNumber++;
-      this.zonePassService.passZone(this.currentZonePassNumber);
-
+      if (this.currentZonePassNumber <= 3){ //避免bug的可能，bonus关就不去更新了
+        this.zonePassService.passZone(this.currentZonePassNumber);
+      }
       this.authService.increaseZonePassed(this.authService.getUsername()).subscribe(
         response => {
           console.log('Update success!');
@@ -129,9 +130,51 @@ export class UiPaintingComponent {
           ];
         }
         break;
+      case 2:
+        {
+          this.imgPath = "./assets/pictures/Sunrise.jpg"
+          this.colorDrops = [
+            { idx: 0, color: '#6c8593', selected: false, passed: false },
+            { idx: 1, color: '#ce7a69', selected: false, passed: false },
+            { idx: 2, color: '#9ea993', selected: false, passed: false }
+          ];
+        }
+        break;
       default:
+        const randomColor : string = this.changeToRandomColor();
+        this.colorDrops = [
+          { idx: 0, color: randomColor, selected: false, passed: false }
+        ];
         break;
     }
+  }
+
+  applyRandomColorToImage(color: string) {
+    const imageElement = document.getElementById('painting-image');
+    if (imageElement) {
+      imageElement.style.backgroundColor = color;
+      imageElement.style.width = '100%';
+      imageElement.style.height = '100%';
+      imageElement.style.display = 'block';
+    }
+  }
+
+  changeToRandomColor():string {
+    const randomColor = this.getRandomColor();
+    this.currentColor = randomColor;
+    this.imgPath = ""; // 或者设置为透明或空白图片的路径
+    console.log(`Changed to random color: ${randomColor}`);
+    this.applyRandomColorToImage(randomColor);
+    return randomColor;
+  }
+  
+  getRandomColor(): string {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
   }
 
   hexToRGB(hex: string): number[] {

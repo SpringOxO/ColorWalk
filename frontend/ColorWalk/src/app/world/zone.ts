@@ -376,6 +376,34 @@ export class Zone3 extends Zone {
         });
     }
 
+    override loadPainting(): void {
+        const loader = new GLTFLoader();
+        loader.load('assets/models/painting_3.glb', (gltf) => {
+            gltf.scene.traverse((child) => {
+                if (child instanceof THREE.Mesh) { //设置全透明
+                    const material = child.material;
+                    material.transparent = true;
+                    material.opacity = 0;
+                    this.corridorMaterials.push(material);
+                }
+            });
+
+            this.world.scene.add(gltf.scene);
+            const pos = this.endV.clone().add(new THREE.Vector3(0, 2, 0));
+            gltf.scene.position.set(pos.x, pos.y, pos.z);
+        });
+        
+        this.airWallUnitName = 'airwall_unit_3';
+        loader.load('assets/models/airwall_unit.glb', (gltf) => {
+            this.world.scene.add(gltf.scene);
+            const pos = this.endV.clone();
+            gltf.scene.position.set(pos.x, pos.y, pos.z);
+            gltf.scene.visible = false;
+            gltf.scene.name = this.airWallUnitName;
+            this.world.airWalls.push(gltf.scene);
+        });
+    }
+
 
     loadWaveZModel(modelPath: string, v: THREE.Vector3){
         v.x += 1.2;
@@ -445,5 +473,89 @@ export class Zone3 extends Zone {
             wave.position.z = this.waves_z_base_pos[this.waves_z.indexOf(wave)].z 
                                 + Math.sin(time * frequency + this.waves_z_time_bias[this.waves_z.indexOf(wave) % 3]) * amplitude;
         });
+    }
+}
+
+@Injectable()
+export class Zone4 extends Zone {
+    private corridorMaterials: THREE.MeshStandardMaterial[] = [];//用来做模型透明度变化，虽然那些material不是MeshStandardMaterial，但不知道为什么这数组能用
+    private fadeDuration: number = 2; // 渐变持续时间(秒)
+
+    private clock: THREE.Clock = new THREE.Clock();
+
+    constructor(world: World, startV : THREE.Vector3) {
+        super(world, startV);
+        this.blocked = false; //反正空气墙封死了，不要让它update了
+    }
+
+    override loadCorridorModel(): void {
+        this.endV.add(new THREE.Vector3(0, 0, -6));
+
+        this.corridorModelPath = 'assets/models/corridor_4.glb';
+        const loader = new GLTFLoader();
+        loader.load(this.corridorModelPath, (gltf) => {
+            gltf.scene.traverse((child) => {
+                if (child instanceof THREE.Mesh) { //设置全透明
+                    // console.log("yes");
+                    const material = child.material;
+                    material.transparent = true;
+                    material.opacity = 0;
+                    this.corridorMaterials.push(material);
+                }
+            });
+
+            this.world.scene.add(gltf.scene);
+            gltf.scene.position.set(this.startV.x, this.startV.y, this.startV.z);
+        });
+    }
+
+    override loadAirWall(): void {
+        this.corridorModelPath = 'assets/models/airwall_4.glb';
+        const loader = new GLTFLoader();
+        loader.load(this.corridorModelPath, (gltf) => {
+            this.world.scene.add(gltf.scene);
+            gltf.scene.position.set(this.startV.x, this.startV.y, this.startV.z);
+            gltf.scene.visible = false;
+            // gltf.scene.name = this.airWallName;
+            this.world.airWalls.push(gltf.scene);
+        });
+    }
+
+    override loadPainting(): void {
+        const loader = new GLTFLoader();
+        loader.load('assets/models/painting_end.glb', (gltf) => {
+            gltf.scene.traverse((child) => {
+                if (child instanceof THREE.Mesh) { //设置全透明
+                    const material = child.material;
+                    material.transparent = true;
+                    material.opacity = 0;
+                    this.corridorMaterials.push(material);
+                }
+            });
+
+            this.world.scene.add(gltf.scene);
+            const pos = this.endV.clone().add(new THREE.Vector3(0, 2, 0));
+            gltf.scene.position.set(pos.x, pos.y, pos.z);
+        });
+    }
+
+    override update(): void {
+        super.update();
+        const time = this.clock.getElapsedTime();
+
+        //随时间让材质变不透明
+        if (time <= this.fadeDuration) {
+            const opacity = time / this.fadeDuration;
+            this.corridorMaterials.forEach((material) => {
+              material.opacity = opacity;
+            });
+          } else {
+            this.corridorMaterials.forEach((material) => {
+              material.opacity = 1;
+            });
+        }
+
+        const amplitude = 1;
+        const frequency = 1.5;
     }
 }

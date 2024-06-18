@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { Player, PlayerLocal } from './player';
-import { Zone, Zone1, Zone2, Zone3 } from './zone';
+import { Zone, Zone1, Zone2, Zone3, Zone4 } from './zone';
 import { ZonePassService } from '../zone-pass.service';
 import { Observable, Subscription, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
@@ -17,7 +17,6 @@ export class World implements OnDestroy {
   private camera!: THREE.OrthographicCamera;
   public scene!: THREE.Scene;
   private light!: THREE.AmbientLight;
-  private controls!: OrbitControls;
   private raycaster = new THREE.Raycaster();
   private mouse = new THREE.Vector2();
   private savedColor = [1, 1, 0];
@@ -56,7 +55,7 @@ export class World implements OnDestroy {
       map(response => {
         // console.log(response);
         // console.log(response.zonepassed);
-        return response.zonepassed;
+        return Math.min(response.zonepassed, 3);
       }),
       catchError(error => {
         console.error('Error retrieving user:', error);
@@ -154,7 +153,6 @@ export class World implements OnDestroy {
 
   initZone2 (){
     const zone2 : Zone2 = new Zone2(this, this.zones[this.zones.length - 1].endV.clone());
-    // const zone2 : Zone2 = new Zone2(this, new THREE.Vector3(0, 0, -24));
     this.zones.push(zone2);
 
     // this.initZone3();
@@ -162,8 +160,12 @@ export class World implements OnDestroy {
 
   initZone3 (){
     const zone3 : Zone3 = new Zone3(this, this.zones[this.zones.length - 1].endV.clone());
-    // const zone2 : Zone2 = new Zone2(this, new THREE.Vector3(0, 0, -24));
     this.zones.push(zone3);
+  }
+
+  initZone4 (){
+    const zone4 : Zone4 = new Zone4(this, this.zones[this.zones.length - 1].endV.clone());
+    this.zones.push(zone4);
   }
 
   checkNearPosition (position1 : THREE.Vector3, position2 : THREE.Vector3): boolean{
@@ -246,6 +248,9 @@ export class World implements OnDestroy {
           break;
         case 1:
           this.initZone3();
+          break;
+        case 2:
+          this.initZone4();
           break;
         default:
           break;
