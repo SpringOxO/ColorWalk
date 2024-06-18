@@ -86,7 +86,7 @@ public class UserService {
         queryWrapper.eq("username", username);
         User user = userMapper.selectOne(queryWrapper);
 
-        user.setZone_passed(zone_passed);
+        user.setZonepassed(zone_passed);
         userMapper.updateById(user);
         Map<String, String> map = new HashMap<>();
         map.put("message", "成功修改用户" + user.getUsername() + "的zone_passed为 " + zone_passed);
@@ -104,7 +104,7 @@ public class UserService {
         queryWrapper.eq("username", username);
         User user = userMapper.selectOne(queryWrapper);
         if (user != null) {
-            user.setZone_passed(user.getZone_passed() + 1);
+            user.setZonepassed(user.getZonepassed() + 1);
             userMapper.updateById(user);
             Map<String, String> map = new HashMap<>();
             map.put("message", "成功将用户" + user.getUsername() + "的zone_passed自增1");
@@ -124,6 +124,7 @@ public class UserService {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", username);
         User user = userMapper.selectOne(queryWrapper);
+        System.out.println(user.getZonepassed());
         return user;
     }
 
