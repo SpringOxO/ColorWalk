@@ -8,6 +8,9 @@
     background: rgb(245, 252, 254);
     overflow: hidden;
     height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #myBody i {
@@ -21,10 +24,10 @@
 
 @keyframes animate {
     0% {
-        transform: translate(-10px, -200px);
+        transform: translate(-10px, -400px);
     }
     100% {
-        transform: translate(calc(10px + 0vw), calc(100vh + 00px));
+        transform: translate(calc(10px + 0vw), calc(80vh + 00px));
     }
 }
 
@@ -46,99 +49,59 @@
 
 .container {
     display: flex;
+    width: 100%;
+    max-height: 100vh;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-}
-
-.login-window {
-    position: relative;
-    width: 300px;
-    text-align: center;
-    padding: 20px;
-    border-radius: 8px;
-}
-
-.background-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: 0;
-    transform-origin: center;
-    transform: scale(1.55);
-}
-
-.title {
-    font-size: 24px;
-    color: #333;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-    z-index: 2;
-}
-
-.input-field {
-    width: 85%;
-}
-
-.input-field input {
-    font-size: 16px;
-    color: #333;
-    padding: 2px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.input-field mat-label {
-    color: #555;
-    font-family: 'Georgia', serif;
-}
-
-.form-field {
-    margin-bottom: 10px;
-}
-
-.button-group {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.full-width-button {
-    width: 80%;
-    margin-bottom: 10px;
-    padding: 10px;
-    font-size: 16px;
-    border: none;
-    border-radius: 2px;
-    cursor: pointer;
-    background-color: #f4f4f4; /* 浅灰色背景 */
-    color: #333; /* 深灰色文字 */
-    border: 1px solid #ccc; /* 添加边框 */
-    font-family: 'Georgia', serif; /* 使用衬线字体 */
-}
-
-.full-width-button:hover {
-    background-color: #d0bfa5; /* 鼠标悬停时的背景颜色 */
-}
-
-.login-button {
-    /* 复古风格的颜色和样式 */
-    background-color: #c2b6a3; /* 米色背景 */
-    color: #4b3a29; /* 深棕色文字 */
-}
-
-.register-button {
-    /* 复古风格的颜色和样式 */
-    background-color: #c2b6a3; /* 浅褐色背景 */
-    color: #4b3a29; /* 深褐色文字 */
+    z-index: 999;
+    overflow: auto; /* Allows scrolling if content is larger than the container */
 }
 
 table {
+    /* display: flex; */
+    width: 100%;
+    margin: auto; /* Centers the table horizontally */
+    background-color: rgba(203, 253, 255, 0.095);
+    max-height: 80vh;
+    
+}
+  
+th.mat-header-cell, td.mat-cell {
+    text-align: center;
+}
+
+mat-card {
+    width: 100%;
+    max-width: 800px;
+    max-height: 700px;
+    margin: 20px;
+    overflow: auto;
+    background-color: #f5f5f5;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+  
+  table {
     width: 100%;
   }
   
-  th.mat-header-cell, td.mat-cell {
-    text-align: center;
+  th.mat-header-cell {
+    font-weight: bold;
+    color: #333;
+    background-color: #e0e0e0;
+  }
+  
+  td.mat-cell {
+    padding: 12px;
+  }
+  
+  tr.mat-row:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  tr.mat-row:hover {
+    background-color: #ebebeb;
+  }
+  
+  button.mat-raised-button {
+    margin-right: 8px;
   }
