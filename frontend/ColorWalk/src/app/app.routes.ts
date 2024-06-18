@@ -13,6 +13,6 @@ export const routes: Routes = [
     {path: 'login', component: LoginComponent},
     { path: 'world', component: WorldComponent, canActivate: [AuthGuard] },
     { path: 'whiteworld', component: WhiteWorldComponent, canActivate: [AuthGuard] },
-    { path: 'info', component: UserManageComponent }
+    { path: 'info', component: UserManageComponent, canActivate: [AuthGuard] }
 ];
  
