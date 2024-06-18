@@ -31,6 +31,7 @@ export class UiPaintingComponent {
   currentColor : string | null = '#000000';  // 默认颜色
   private paletteSubscription!: Subscription; //同步调色板当前颜色的订阅
   private paintingNearSubscription!: Subscription; //获取靠近挂画的信号的订阅
+  private zonePassedSubscription!: Subscription; //区域的订阅
 
   currentZonePassNumber : number = 0;
 
@@ -58,6 +59,17 @@ export class UiPaintingComponent {
     this.paletteSubscription = this.paletteColorService.currentColor.subscribe(color => {
       this.currentColor = color;
     });
+    // this.subscription = this.zonePassService.zoneNumber.subscribe(zoneNumber => {// 这里也用订阅，service里的永远是最权威的 用在下面？
+    //   this.currentZonePassNumber = zoneNumber;
+    // });
+
+    this.zonePassedSubscription = this.zonePassService.zoneNumberChanged$.subscribe(
+      zoneNumber => {
+        this.currentZonePassNumber = zoneNumber;
+        this.updatePainting();
+      }
+    );
+
     this.paintingNearSubscription = this.paintingNearService.onEvent().subscribe(() => {
       // 在这里处理接收到的事件
       // console.log('near painting!');
