@@ -5,7 +5,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { Player, PlayerLocal } from './player';
 import { Zone, Zone1, Zone2, Zone3 } from './zone';
 import { ZonePassService } from '../zone-pass.service';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { PaintingNearService } from '../painting-near.service';
 import { AuthService } from '../auth.service';
 
@@ -42,22 +43,26 @@ export class World implements OnDestroy {
       // console.log(zoneNumber);
       this.currentZonePassNumber = zoneNumber;
     });
-    this.currentZonePassNumber = this.getMyZonePassedNumber();
+    this.getMyZonePassedNumber().subscribe(zonePassedNumber => {
+      this.currentZonePassNumber = zonePassedNumber;
+      console.log(this.currentZonePassNumber);
+      this.zonePassService.passZone(this.currentZonePassNumber); //保险起见
+    });
   }
 
-  getMyZonePassedNumber() : number {
+  getMyZonePassedNumber(): Observable<number> {
     const username = this.authService.getUsername();
-    this.authService.getMyInfo(username).subscribe(
-      response => {
-        console.log(response);
-        return 0;
-      },
-      (error) => {
+    return this.authService.getMyInfo(username).pipe(
+      map(response => {
+        // console.log(response);
+        // console.log(response.zonepassed);
+        return response.zonepassed;
+      }),
+      catchError(error => {
         console.error('Error retrieving user:', error);
-        return 0;
-      }
+        return of(0);
+      })
     );
-    return 0;
   }
 
 
@@ -94,6 +99,8 @@ export class World implements OnDestroy {
       while (this.scene.children.length > 0) {
         this.scene.remove(this.scene.children[0]);
       }
+
+      this.preZonePassNumber = 0;
   
       // 销毁渲染器
       this.renderer.dispose();
@@ -230,7 +237,7 @@ export class World implements OnDestroy {
   }
 
   public render(): void {
-    while (this.currentZonePassNumber != this.preZonePassNumber){ //有区域应该解锁
+    while (this.currentZonePassNumber > this.preZonePassNumber){ //有区域应该解锁
       console.log(this.zones.length);
       this.zones[this.zones.length - 1].zonePass();
       switch (this.preZonePassNumber){
