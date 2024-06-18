@@ -18,9 +18,12 @@
     <mat-card-content>
       <div class="color-selections">
         <div *ngFor="let drop of colorDrops" class="teardrop"
-             [style.background-color]="drop.color"
-             (click)="selectColor(drop)"
-             [class.selected]="drop.selected"></div>
+            [style.background-image]="drop.passed ? 'url(yes-45.svg)' : 'none'"
+            [style.background-size]="drop.passed ? '45% 45%' : 'initial'"
+            [style.background-color]="drop.color"
+            (click)="selectColor(drop)"
+            [class.selected]="drop.selected">
+          </div>
       </div>
     </mat-card-content>
     <mat-card-actions class="ai-button">

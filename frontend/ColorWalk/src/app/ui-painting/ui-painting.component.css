@@ -3,6 +3,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    min-height: 650px;
 }
 
 .teardrops {
@@ -66,6 +67,7 @@
     border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
     transform: rotate(45deg);
     border: 2px solid #fff;
+
 }
 
 .teardrop.large {
@@ -91,4 +93,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.yes-img{
+    transform: rotate(-45deg);
+    scale: 0.2;
 }
