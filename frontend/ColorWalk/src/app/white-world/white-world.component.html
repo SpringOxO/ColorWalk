@@ -1,3 +1,18 @@
-<div class="engine-wrapper">
+<div class="engine-wrapper" (click)="shrinkMessageWrapper($event)">
     <canvas #rendererCanvas id="renderCanvas" (click)="coloration($event)"></canvas>
+    <div class="chat-container" id="chatContainer" (click)="expandMessageWrapper($event)">
+        <div [ngStyle]="{'max-height': messageWrapperHeight}" class="messageWrapper">
+            <div *ngFor="let message of whiteWorld.messageQueue" class="message">
+                <p>
+                    <span [style.color]="message['type']">{{ message['typePrint'] }}</span>
+                    {{ message['message'] }}
+                </p>
+            </div>
+        </div>
+        <div class="send">
+            <input id="idInput" type="text" [(ngModel)]="msgTarget" placeholder="/all">
+            <input id="textInput" type="text" [(ngModel)]="newMessage" placeholder="Type a message">
+            <button id="sendingButton" (click)="sendMessage()">Send</button>
+        </div>
+    </div>
 </div>

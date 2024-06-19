@@ -23,6 +23,9 @@ export class WhiteWorld implements OnDestroy {
   public remoteData !: any[];
   public colorData !: any[];
 
+  public messageQueue: any[] = [];
+  public onLineUser: string[] = [];
+
   private scene_scale = 0.8;
 
   public airWalls : THREE.Group<THREE.Object3DEventMap> [] = [];
@@ -92,7 +95,7 @@ export class WhiteWorld implements OnDestroy {
         if (this.colorData) {
           this.socketColor(this.colorData);
         }
-      }, 1000);
+      }, 2000);
     });
   }
 
@@ -400,5 +403,27 @@ export class WhiteWorld implements OnDestroy {
   removePlayer(player: Player){
     this.scene.remove(player.model);
     this.remotePlayers.splice(this.remotePlayers.indexOf(player), 1);
+  }
+
+  public sendMessage(to: string, message: string): void {
+    if(to === '/all') {
+      this.messageQueue.push({
+        'message': 'to all' + ': ' + message,
+        'typePrint': '(公开)',
+        'type': 'green'
+      })      
+    } else {
+      if (!this.onLineUser.find(u => u === to)) {
+        alert('oops! ' + to + ' is currently not online.')      
+        return  
+      }
+      this.messageQueue.push({
+        'message': 'to ' + to + ': ' + message,
+        'typePrint': '(私聊)',
+        'type': 'green'
+      })  
+    }
+
+    this.player.sendChatMessage(to, message);
   }
 }

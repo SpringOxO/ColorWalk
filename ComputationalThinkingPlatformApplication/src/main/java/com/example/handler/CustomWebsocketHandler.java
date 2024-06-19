@@ -3,6 +3,7 @@ package com.example.handler;
 import com.example.model.UserData;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -36,11 +37,11 @@ public class CustomWebsocketHandler extends TextWebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         String sessionId = session.getId();
         UserData userData = new UserData(0, 0, 0, sessionId, session);
-        userSessions.put(sessionId, userData);
+        //userSessions.put(sessionId, userData);
 
         session.sendMessage(new TextMessage("{\"type\":\"setId\", \"id\":\"" + sessionId + "\"}"));
         session.sendMessage(new TextMessage("{\"type\":\"colorData\", \"data\":" + objectMapper.writeValueAsString(faceColorMap.values()) + "}"));
-
+        session.sendMessage(new TextMessage("{\"type\":\"remoteData\", \"data\":" + objectMapper.writeValueAsString(sid2uid.values().toArray()) + "}"));
         System.out.println(sessionId + " connected");
     }
 
@@ -60,43 +61,26 @@ public class CustomWebsocketHandler extends TextWebSocketHandler {
             case "colorFace":
                 handleColorFace(session, data);
                 break;
-//            case "incrementZone":
-//                handleIncrementZone(session);
-//                break;
-//            case "updateZone":
-//                handleUpdateZone(session, data);
-//                break;
-//            case "getOwnUser":
-//                handleGetOwnUser(session);
-//                break;
-//            case "getUserList":
-//                handleGetUserList(session);
-//                break;
-//            case "deleteUser":
-//                handleDeleteUser(session, data);
-//                break;
-//            case "updateUser":
-//                handleUpdateUser(session, data);
-//                break;
+            case "chatMessage":
+                handleChatMessage(session, data);
+                break;
         }
     }
 
     private void handleInit(WebSocketSession session, Map<String, Object> data) throws Exception {
         String sessionId = session.getId();
-        String newId = (String) data.get("id");
-        sid2uid.put(sessionId, newId);
-        UserData userData = userSessions.remove(sessionId); // Remove the old entry with sessionId
+        String userId = (String) data.get("id");
+        sid2uid.put(sessionId, userId);
 
-        if (userData != null) {
-            userData.setX(doubleValue(data.get("x")) );
-            userData.setY(doubleValue(data.get("y")) );
-            userData.setZ(doubleValue(data.get("z")) );
-            userData.setId(newId);
+        UserData userData = new UserData(0, 0, 0, userId, session);
+        userData.setX(doubleValue(data.get("x")) );
+        userData.setY(doubleValue(data.get("y")) );
+        userData.setZ(doubleValue(data.get("z")) );
+        userData.setId(sessionId);
 
-            userSessions.put(newId, userData); // Add new entry with newId
-
-            System.out.println("socket.init " + sessionId + " with data: " + data);
-        }
+        userSessions.put(userId, userData); // Add new entry with newId
+        broadcastOnline(userId);
+        System.out.println("socket.init " + sessionId + " with data: " + data);
     }
 
     private void handleUpdate(WebSocketSession session, Map<String, Object> data) {
@@ -107,8 +91,7 @@ public class CustomWebsocketHandler extends TextWebSocketHandler {
             userData.setX(doubleValue(data.get("x")) );
             userData.setY(doubleValue(data.get("y")) );
             userData.setZ(doubleValue(data.get("z")) );
-
-            System.out.println("user.update " + userId + " with data: " + data);
+            //System.out.println("socket.update " + session.getId() + " with data: " + data);
         }
     }
 
@@ -123,67 +106,57 @@ public class CustomWebsocketHandler extends TextWebSocketHandler {
         System.out.println(data.get("points") + " " + data.get("color"));
     }
 
-//    private void handleIncrementZone(WebSocketSession session) {
-//        String userId = sid2uid.get(session.getId());
-//        UserData userData = userSessions.get(userId);
-//        if (userData != null) {
-//            userData.incrementZonePassed();
-//            System.out.println("Incremented zone_passed for user: " + userId);
-//        }
-//    }
-//
-//    private void handleUpdateZone(WebSocketSession session, Map<String, Object> data) {
-//        String userId = sid2uid.get(session.getId());
-//        UserData userData = userSessions.get(userId);
-//        if (userData != null && data.containsKey("zone_passed")) {
-//            userData.setZonePassed((Integer) data.get("zone_passed"));
-//            System.out.println("Updated zone_passed for user: " + userId + " to: " + data.get("zone_passed"));
-//        }
-//    }
-//
-//    private void handleGetOwnUser(WebSocketSession session) throws IOException {
-//        String userId = sid2uid.get(session.getId());
-//        String userData = objectMapper.writeValueAsString(userSessions.get(userId));
-//        session.sendMessage(new TextMessage("{\"type\":\"userdata\", \"data\":" + userData + "}"));
-//        System.out.println("User list JSON: " + userData);
-//    }
-//
-//
-//    private void handleGetUserList(WebSocketSession session) {
-//        try {
-//            System.out.println("User sessions: " + userSessions);
-//            String userList = objectMapper.writeValueAsString(userSessions.values());
-//            System.out.println("User list JSON: " + userList);
-//            session.sendMessage(new TextMessage("{\"type\":\"userList\", \"data\":" + userList + "}"));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    // 删除任意用户和更新任意用户：需要传用户id进来
-//    private void handleDeleteUser(WebSocketSession session, Map<String, Object> data) {
-//        String userId = (String) data.get("id");
-//        if (userSessions.containsKey(userId)) {
-//            userSessions.remove(userId);
-//            broadcastDeletePlayer(userId);
-//            System.out.println("Deleted user: " + userId);
-//        }
-//    }
-//
-//    private void handleUpdateUser(WebSocketSession session, Map<String, Object> data) throws Exception {
-//        String userId = (String) data.get("id");
-//        UserData userData = userSessions.get(userId);
-//        if (userData != null) {
-//            if (data.containsKey("x")) userData.setX(doubleValue(data.get("x")) );
-//            if (data.containsKey("y")) userData.setY(doubleValue(data.get("y")) );
-//            if (data.containsKey("z")) userData.setZ(doubleValue(data.get("z")) );
-//            if (data.containsKey("zone_passed")) userData.setZonePassed((Integer) data.get("zone_passed"));
-//
-//            // Broadcast the updated user data to all connected sessions
-//            broadcastPlayerData();
-//            System.out.println("Updated user data for user: " + userId + " with data: " + data);
-//        }
-//    }
+    private void handleChatMessage(WebSocketSession session, Map<String, Object> data) {
+        System.out.println("socket.chatMessage ");
+        String type = (String) data.get("chatType");
+        if (type.equals("private")) {
+            handlePrivateChat(session, data);
+        } else {
+            handlePublicChat(session, data);
+        }
+    }
+
+    private void handlePrivateChat(WebSocketSession session, Map<String, Object> data) {
+        System.out.println("socket.chatMessage private");
+        String to = (String) data.get("to");
+        String from = sid2uid.get(session.getId());
+        String message = (String) data.get("message");
+
+        try {
+            String messageData = objectMapper.writeValueAsString(Map.of(
+                    "type", "chatMessage",
+                    "chatType", "private",
+                    "from", from,
+                    "message", message
+            ));
+            userSessions.get(to).getSession().sendMessage(new TextMessage(messageData));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handlePublicChat(WebSocketSession session, Map<String, Object> data) {
+        System.out.println("socket.chatMessage public");
+        String from = sid2uid.get(session.getId());
+        String message = (String) data.get("message");
+
+        try {
+            String messageData = objectMapper.writeValueAsString(Map.of(
+                    "type", "chatMessage",
+                    "chatType", "public",
+                    "from", from,
+                    "message", message
+            ));
+            for (UserData userData : userSessions.values()) {
+                if (userData.getSession().isOpen() && userData.getSession() != session) {
+                    System.out.println("Sending message to " + userData.getId() + " " + userData.getSession().getId());
+                    userData.getSession().sendMessage(new TextMessage(messageData));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     private void broadcastPlayerData() {
         try {
@@ -218,20 +191,42 @@ public class CustomWebsocketHandler extends TextWebSocketHandler {
         }
     }
 
-    @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        userSessions.remove(session.getId());
-        broadcastDeletePlayer(session.getId());
+    private void broadcastOnline(String userId) {
+        try {
+            String message = objectMapper.writeValueAsString(Map.of(
+                    "type", "online",
+                    "data", userId
+            ));
+            for (WebSocketSession session : userSessions.values().stream().map(UserData::getSession).toList()) {
+                if (session.isOpen() && !session.getId().equals(userId)) {
+                    session.sendMessage(new TextMessage(message));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private void broadcastDeletePlayer(String sessionId) {
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        String sessionId = session.getId();
+        String uid = sid2uid.remove(sessionId);
+        if (uid != null) {
+            userSessions.remove(uid);
+            System.out.println(uid + " disconnected");
+            broadcastDeletePlayer(uid);
+        }
+    }
+
+    private void broadcastDeletePlayer(String uid) {
         try {
             String message = objectMapper.writeValueAsString(Map.of(
                     "type", "deletePlayer",
-                    "id", sessionId
+                    "data", uid
             ));
             for (WebSocketSession session : userSessions.values().stream().map(UserData::getSession).toList()) {
                 if (session.isOpen()) {
+                    System.out.println("Sending delete message to " + sid2uid.get(session.getId()));
                     session.sendMessage(new TextMessage(message));
                 }
             }

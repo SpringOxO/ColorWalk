@@ -1,0 +1,56 @@
+.chat-container {
+    position: fixed;
+    bottom: 0px;
+    left: 25px;
+    width: 400px;
+    height: auto;
+    max-height: 300px;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+
+.messageWrapper {
+    max-height: 50px;
+    overflow-y: scroll;
+    scrollbar-color: transparent transparent;
+    transition: max-height 0.3s ease;
+}
+
+.messageWrapper.expanded {
+    max-height: 300px; /* 展开后的高度 */
+}
+
+.message {
+    padding: 1px 0;
+    margin: 5px;
+    color: #000;
+}
+
+.send {
+    display: inline;
+}
+
+#idInput {
+    width: 25%;
+    padding: 10px 0px;
+    border: 0;
+    border-bottom: 1px solid #ccc;
+}
+
+#textInput {
+    width: 60%;
+    margin-left: 1%;
+    padding: 10px  0px;
+    border: 0;
+    border-bottom: 1px solid #ccc;
+}
+
+#sendingButton {
+    width: 12%;
+    padding: 10px  0px;
+    margin-left: 1%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+}

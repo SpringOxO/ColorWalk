@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { WhiteWorld } from './white-world.service';
+import { from } from 'rxjs';
 
 
 @Injectable()
@@ -18,7 +19,7 @@ export class Player {
 
   // public last_position: THREE.Vector3 = new THREE.Vector3();
 
-  constructor(private world: WhiteWorld, @Inject('localToken')private local: boolean) {
+  constructor(protected world: WhiteWorld, @Inject('localToken')private local: boolean) {
     this.loadModel();
   }
 
@@ -126,9 +127,11 @@ export class PlayerLocal extends Player {
       this.setupKeyControls();
     }
     const player = this;
+    const username = localStorage.getItem('username');
     const initMsg= {
       type: 'init',
-      "model": "model1",
+      "id": username,
+      'model': 'model1',
       "colour": "blue",
       "x": 0,
       "y": 0,
@@ -150,18 +153,31 @@ export class PlayerLocal extends Player {
             world.scene.remove(rplayers[0].model);
           }
         } // initialisingPlayers not implemented
-      } else if (msg.type === 'chat message') {
+        console.log(msg.data + ' offline');
+        world.onLineUser.splice(world.onLineUser.indexOf(msg.data), 1);
+        console.log(world.onLineUser);
+      } else if (msg.type === 'chatMessage') {
         let chatMsg =msg.message;
-        console.log(chatMsg); // 
+        console.log(msg); // 
+        world.messageQueue.push({
+          'message': msg.from + ': ' + chatMsg,
+          'typePrint': msg.chatType === 'public'? '(公开)': '(私聊)',
+          'type': msg.chatType === 'public'? 'blue': 'yellow',
+        })
+        console.log(world.messageQueue)
       } else if (msg.type === 'setId') {
         player.id = msg.id;
       } else if (msg.type === 'remoteData') {
         world.remoteData = msg.data;
         //console.log(world.remoteData);
       } else if (msg.type === 'colorData') {
-        console.log('colorData111')
+        //console.log('colorData111')
         world.colorData = msg.data;
         world.socketColor(msg.data);
+      } else if (msg.type === 'online') {
+        console.log(msg.data + ' online');
+        if (msg.data !== localStorage.getItem('username'))
+          world.onLineUser.push(msg.data);
       }
     };
   }
@@ -221,6 +237,31 @@ export class PlayerLocal extends Player {
 
   public updateColor(updateMsg: any): void{
     this.socket.send(JSON.stringify(updateMsg));
+  }
+
+  public sendChatMessage(to: string, message: string): void {
+    if (to === '/all') {
+      const username = localStorage.getItem('username');
+      const chatMsg = {
+        type: 'chatMessage',
+        from: username,
+        to: to,
+        chatType: 'public',
+        message: message
+      };
+      this.socket.send(JSON.stringify(chatMsg));      
+    } else {
+      const username = localStorage.getItem('username');
+      const chatMsg = {
+        type: 'chatMessage',
+        from: username,
+        to: to,
+        chatType: 'private',
+        message: message
+      };
+      this.socket.send(JSON.stringify(chatMsg));      
+    }
+
   }
 
 }
