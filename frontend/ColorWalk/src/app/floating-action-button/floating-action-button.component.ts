@@ -63,9 +63,9 @@ export class FloatingActionButtonComponent {
 
   @HostListener('document:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent) {
-    if (event.key === '1') {
+    if (event.key === '-') {
       this.showPalette = !this.showPalette;
-    } else if (event.key === '2') {
+    } else if (event.key === '=') {
       this.showPalette = false;
       this.buttonsVisible = true;
       this.nativePick();
