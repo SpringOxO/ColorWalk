@@ -5,6 +5,67 @@ import { PaletteColorService } from '../palette-color.service';
 import { PaletteCloseService } from '../palette-close.service';
 import { ColorService } from '../color.service';
 
+interface MixStrategy {
+  mix(ir: number, ig: number, ib: number, nr: number, ng: number, nb: number) : string;
+}
+
+class AddStrategy implements MixStrategy{
+  mix(ir: number, ig: number, ib: number, nr: number, ng: number, nb: number): string {
+    const rate = 0.05;
+    const meanr = ir + (nr -  ir) * rate;
+    const meang = ig + (ng -  ig) * rate;
+    const meanb = ib + (nb -  ib) * rate;
+
+    const maxr = Math.max(meanr, ir);
+    const maxg = Math.max(meang, ig);
+    const maxb = Math.max(meanb, ib);
+
+    const r = Math.round(maxr).toString(16).padStart(2, '0');
+    const g = Math.round(maxg).toString(16).padStart(2, '0');
+    const b = Math.round(maxb).toString(16).padStart(2, '0');
+
+    return '#' + r + g + b;
+  }
+}
+
+class PgmStrategy implements MixStrategy{
+  mix(ir: number, ig: number, ib: number, nr: number, ng: number, nb: number): string {
+    const rate = 0.05;
+    const meanr = ir + (nr -  ir) * rate;
+    const meang = ig + (ng -  ig) * rate;
+    const meanb = ib + (nb -  ib) * rate;
+
+    const minr = Math.min(meanr, ir);
+    const ming = Math.min(meang, ig);
+    const minb = Math.min(meanb, ib);
+
+    const r = Math.round(0.5 * meanr + 0.5 * minr).toString(16).padStart(2, '0');
+    const g = Math.round(0.5 * meang + 0.5 * ming).toString(16).padStart(2, '0');
+    const b = Math.round(0.5 * meanb + 0.5 * minb).toString(16).padStart(2, '0');
+
+    return '#' + r + g + b;
+  }
+}
+
+class SubStrategy implements MixStrategy{
+  mix(ir: number, ig: number, ib: number, nr: number, ng: number, nb: number): string {
+    const rate = 0.05;
+    const meanr = ir + (nr -  ir) * rate;
+    const meang = ig + (ng -  ig) * rate;
+    const meanb = ib + (nb -  ib) * rate;
+
+    const minr = Math.min(meanr, ir);
+    const ming = Math.min(meang, ig);
+    const minb = Math.min(meanb, ib);
+
+    const r = Math.round(minr).toString(16).padStart(2, '0');
+    const g = Math.round(ming).toString(16).padStart(2, '0');
+    const b = Math.round(minb).toString(16).padStart(2, '0');
+
+    return '#' + r + g + b;
+  }
+}
+
 @Component({
   selector: 'app-palette',
   standalone: true,
@@ -34,6 +95,11 @@ export class PaletteComponent implements AfterViewChecked {
 
   showPalette: boolean = false;
 
+  mixStrategy: MixStrategy;
+  addStrategy = new AddStrategy();
+  subStrategy = new SubStrategy();
+  pgmStrategy = new PgmStrategy();
+
   currentColorDiv: {[key: string]: string} = {
     'background-color': '#ffffff',
     width: '300px',
@@ -42,7 +108,9 @@ export class PaletteComponent implements AfterViewChecked {
   };
 
   constructor(private paletteColorService: PaletteColorService, private paletteCloseService: PaletteCloseService,
-    private colorService: ColorService) { }
+    private colorService: ColorService) { 
+      this.mixStrategy = this.pgmStrategy;
+  }
   
   ngOnInit() {
     this.paletteColorService.currentColor.subscribe(currentColor => {
@@ -152,6 +220,18 @@ export class PaletteComponent implements AfterViewChecked {
     this.ctx.putImageData(imageData, x - radius, y - radius);
   }
 
+  applyAddStrategy(){
+    this.mixStrategy = this.addStrategy;
+  }
+
+  applySubStrategy(){
+    this.mixStrategy = this.subStrategy;
+  }
+
+  applyPgmStrategy(){
+    this.mixStrategy = this.pgmStrategy;
+  }
+
   changeColor(event: MouseEvent) {
     if (event.button === 0) {
       console.log('Change color');
@@ -197,6 +277,9 @@ export class PaletteComponent implements AfterViewChecked {
       console.log(this.currentColorDiv['background-color']);
       return;
     }
+
+    this.currentColor = this.mixStrategy.mix(currentRgb.r, currentRgb.g, currentRgb.b, newRgb.r, newRgb.g, newRgb.b);
+
     //更新一下调色逻辑：插值
 
     // const currentRr = currentRgb.r / 255;
@@ -214,18 +297,18 @@ export class PaletteComponent implements AfterViewChecked {
     // const g = Math.round(currentRgb.g + (newRgb.g -  currentRgb.g) * rate).toString(16).padStart(2, '0');
     // const b = Math.round(currentRgb.b + (newRgb.b -  currentRgb.b) * rate).toString(16).padStart(2, '0');
 
-    const rate = 0.05;
-    const meanr = currentRgb.r + (newRgb.r -  currentRgb.r) * rate;
-    const meang = currentRgb.g + (newRgb.g -  currentRgb.g) * rate;
-    const meanb = currentRgb.b + (newRgb.b -  currentRgb.b) * rate;
+    // const rate = 0.05;
+    // const meanr = currentRgb.r + (newRgb.r -  currentRgb.r) * rate;
+    // const meang = currentRgb.g + (newRgb.g -  currentRgb.g) * rate;
+    // const meanb = currentRgb.b + (newRgb.b -  currentRgb.b) * rate;
 
-    const minr = Math.min(meanr, currentRgb.r);
-    const ming = Math.min(meang, currentRgb.g);
-    const minb = Math.min(meanb, currentRgb.b);
+    // const minr = Math.min(meanr, currentRgb.r);
+    // const ming = Math.min(meang, currentRgb.g);
+    // const minb = Math.min(meanb, currentRgb.b);
 
-    const r = Math.round(0.5 * meanr + 0.5 * minr).toString(16).padStart(2, '0');;
-    const g = Math.round(0.5 * meang + 0.5 * ming).toString(16).padStart(2, '0');;
-    const b = Math.round(0.5 * meanb + 0.5 * minb).toString(16).padStart(2, '0');;
+    // const r = Math.round(0.5 * meanr + 0.5 * minr).toString(16).padStart(2, '0');;
+    // const g = Math.round(0.5 * meang + 0.5 * ming).toString(16).padStart(2, '0');;
+    // const b = Math.round(0.5 * meanb + 0.5 * minb).toString(16).padStart(2, '0');;
 
 
     // let rate = 0.9 + 0.1 * this.colorAmount / this.maxColorAmount;
@@ -239,7 +322,7 @@ export class PaletteComponent implements AfterViewChecked {
     // const b = Math.round((currentRgb.b + newRgb.b * (this.colorAmount)) / (this.colorAmount + 1) ).toString(16).padStart(2, '0');;
     // this.colorAmount ++;
 
-    this.currentColor = '#' + r + g + b;
+    // this.currentColor = '#' + r + g + b;
     this.currentColorDiv['background-color'] = this.currentColor;
     console.log(this.currentColorDiv['background-color']);
   }

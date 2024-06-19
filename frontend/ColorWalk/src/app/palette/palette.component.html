@@ -7,6 +7,9 @@
             (contextmenu)="replaceColor($event)"></button>
         </div>
     </div>
+    <button id="subButton" (click)="applySubStrategy()">SUB</button>
+    <button id="addButton" (click)="applyAddStrategy()">ADD</button>
+    <button id="pgmButton" (click)="applyPgmStrategy()">PGM</button>
     <button class="closeButton" (click)="closePalette()"><mat-icon>close</mat-icon></button>
     <button class="refreshButton" (click)="tryAgain()"><mat-icon>refresh</mat-icon></button>
     <div style="margin-left: 50px; margin-top: 40px;">
