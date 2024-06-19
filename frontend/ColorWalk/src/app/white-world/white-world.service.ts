@@ -283,10 +283,10 @@ export class WhiteWorld implements OnDestroy {
                       colors.setXYZ(i, x, y, z);
                   }
                   colors.needsUpdate = true;
-
+                //console.log('name:' + mesh.name + mesh.id);
                 const updateMsg = {
                   type: 'colorFace',
-                  points: mesh.id + ' ' + positionIndex.join(' '),
+                  points: mesh.name + ' ' + positionIndex.join(' '),
                   color: this.savedColor.join(' ')
                 }
                 this.player.updateColor(updateMsg);
@@ -300,13 +300,14 @@ export class WhiteWorld implements OnDestroy {
         console.log(item)
         const points = item.points;
         const color = item.color;
-        const pointsList: number[] = points.substring(1, points.length - 1).split(' ').map(Number);
+        const pointsList: string[] = points.substring(1, points.length - 1).split(' ');
+        const meshId = pointsList.shift();
+        pointsList.map(Number);
         console.log(pointsList)
         const colorList: number[] = color.split(' ').map(Number);
-        const meshId = pointsList.shift();
         if (meshId === undefined) return;
         console.log(meshId)
-        const mesh = this.scene.getObjectById(meshId) as THREE.Mesh;
+        const mesh = this.scene.getObjectByName(meshId) as THREE.Mesh;
         if (mesh === undefined || mesh.geometry === undefined) return;
         console.log('mesh found')
         const indices = mesh.geometry.index;
@@ -316,11 +317,12 @@ export class WhiteWorld implements OnDestroy {
           const y = colorList[1] / 255;
           const z = colorList[2] / 255;
           for (let i of pointsList) {
-            const currentX = colors.getX(i);
-            const currentY = colors.getY(i);
-            const currentZ = colors.getZ(i);
+            let ii = parseInt(i);
+            const currentX = colors.getX(ii);
+            const currentY = colors.getY(ii);
+            const currentZ = colors.getZ(ii);
             if (currentX !== x || currentY !== y || currentZ !== z) {
-              colors.setXYZ(i, x, y, z);
+              colors.setXYZ(ii, x, y, z);
             }
           }
           colors.needsUpdate = true;
