@@ -164,7 +164,7 @@ export class UiPaintingComponent {
 
   changeToRandomColor():string {
     const randomColor = this.getRandomColor();
-    this.currentColor = randomColor;
+    // this.currentColor = randomColor;
     this.imgPath = "./assets/pictures/transparent.png"; // 或者设置为透明或空白图片的路径
     console.log(`Changed to random color: ${randomColor}`);
     this.applyRandomColorToImage(randomColor);
