@@ -1,44 +1,14 @@
 # ColorWalk - 基于Web3D的多人在线色彩学习平台
 
-## TODO
-
-### UI
-
-* 登陆UI ✔
-* 画幅UI ✔×
-* 调色板 ✔×
-
-### 基本页面与流程
-
-* 注册登陆 ✔
-* 后端用户管理
-
-### 虚拟场景及交互
-
-* 3D场景和交互 ✔×
-* 多人加入场景 ✔×
-
-### 工程
-
-* 文档
-* 设计模式 ？
-* 部署
-
-### 进阶功能
-
-* AI助手 ✔
-* 多模式交互
-* else？
-
-
-
-
-
 ## 项目组织结构
 
 ### 前端
 
-#### 代码组织结构
+#### 1.页面截图
+
+<img src = './ui.jpg'>
+
+#### 2.代码组织结构
 
 ```
 │  index.html
@@ -169,14 +139,29 @@
 - `world`：玩家从场景取色、调色、通过关卡的界面，由`player` `world.service` `zone`组成。`world`服务承担了 Three.js 虚拟场景的创建、更新和管理,作为应用程序的核心部分,协调各个子系统的工作，与其他服务(如`ZonePassService`、`PaintingNearService`、`AuthService`)协同工作,根据用户的学习状态动态加载关卡内容并响应用户与场景的交互。`zone`负责加载和管理不同区域或关卡的 3D 模型和动画，基类 `Zone` 提供了加载走廊模型、空气墙(障碍物)、画作和处理区域过渡逻辑的通用方法。子类并添加了装载具有动画效果的装饰性3D模型以及渐变动画等功能。
 
 
+#### 3.系统架构
+
+<img src = './fe.drawio.jpg'>
+
+#### 4.设计模式
+
+##### 4.1 观察者模式
+
+由于架构中信息的流向比较复杂，例如吸色、调色等都需要更新颜色信息等等，组件间并非简单的父子关系，故对于一些常用的信号，采用订阅-发布模式即观察者模式。
+
+Services包括用户服务、颜色服务、玩家位置相关服务、通关信息传递服务和调色板服务。
+
+##### 4.2 策略模式
+
+在调色中，我们提供了三种调色方法：加色模式（光学）、减色模式（CMY空间）、我们原创的模拟颜料插值调色。为了方便地兼容各种策略，我们使用了策略模式，用户可通过按钮切换当前的混色策略。
 
 
 
-#### 关键功能实现细节
+#### 5. 关键功能实现细节
 
-##### 1 调色功能
+##### 5.1 调色功能
 
-###### 1.1 颜色混合调制
+###### 5.1.1 颜色混合调制
 
  [**完整代码实现**](./frontend/ColorWalk/src/app/palette/palette.component.ts)
 
@@ -216,7 +201,7 @@ mixColor(color: string) {
 
 
 
-###### 1.2 色彩比对判定
+###### 5.1.2 色彩比对判定
 
 [**完整代码实现**](./frontend/ColorWalk/src/app/ui-painting/ui-painting.component.ts)
 
@@ -234,7 +219,7 @@ mixColor(color: string) {
 
 
 
-###### 1.3 页面取色
+###### 5.1.3 页面取色
 
 [**完整代码实现**](./frontend/ColorWalk/src/app/eyedropper/eyedropper.component.ts)
 
@@ -260,7 +245,7 @@ mixColor(color: string) {
 
 获取到颜色值后,代码会通过 `PaletteColorService` 服务将其广播出去,以便其他组件(如调色板组件)可以获取到这个新的颜色值并做出响应。
 
-###### 1.4 实时试色画板
+###### 5.1.4 实时试色画板
 
 [**完整代码实现**](./frontend/ColorWalk/src/app/palette/palette.component.ts)
 
@@ -268,9 +253,9 @@ mixColor(color: string) {
 
 
 
-##### 2 基于Three.js的3D场景交互
+##### 5.2 基于Three.js的3D场景交互
 
-###### 2.1 响应式相机
+###### 5.2.1 响应式相机
 
 [**完整代码实现**](./frontend/ColorWalk/src/app/world/world.service.ts)
 
@@ -307,7 +292,7 @@ mixColor(color: string) {
 
 6. 最后调用 `renderer.setSize(width, height)` 将渲染器的输出尺寸设置为新的窗口大小。
 
-###### 2.2 场景动态加载
+###### 5.2.2 场景动态加载
 
 [**完整代码实现**](./frontend/ColorWalk/src/app/world/world.service.ts)
 
@@ -333,7 +318,7 @@ mixColor(color: string) {
 
 由于模型的加载是基于用户的实际学习进度的,能保证用户在任何时候看到的场景都是与自己的进度相符的。
 
-###### 2.3 模型实时上色
+###### 5.2.3 模型实时上色
 
 [**完整代码实现**](./frontend/ColorWalk/src/app/white-world/white-world.service.ts)
 
@@ -361,9 +346,9 @@ mixColor(color: string) {
 
 
 
-##### 3 场景实时交互
+##### 5.3 场景实时交互
 
-###### 3.1 人物位置与场景色彩同步
+###### 5.3.1 人物位置与场景色彩同步
 
 [**完整代码实现**](./frontend/ColorWalk/src/app/white-world/white-world.service.ts)
 
@@ -387,7 +372,7 @@ mixColor(color: string) {
 
 由此途径,每个客户端都能实时接收其他客户端的颜色编辑操作,并在本地场景中同步更新模型的颜色。
 
-###### 3.2 实时对话互动
+###### 5.3.2 实时对话互动
 
 [**完整代码实现**](./frontend/ColorWalk/src/app/white-world/white-world.service.ts)
 
@@ -400,3 +385,61 @@ mixColor(color: string) {
 - 如果接收者是 `/all`(即公开消息),则直接将消息对象推入 `messageQueue`。
 - 如果接收者是特定用户ID,则先检查该用户是否在 `onLineUser` 列表中,如果不在线则发送失败并给出提示;如果在线,则将消息对象推入 `messageQueue`。
 - 最后,调用 `player.sendChatMessage` 方法,将消息发送到服务器。
+
+#### 6.4 docker
+
+提供了dockerfile，可在前端目录下查看，经测试build无问题。
+
+
+### 后端
+
+#### 1.系统架构
+
+后端主要基于Spring Boot框架，使用mybatis做数据持久化，使用mysql作为数据库，jdbc进行数据库连接。
+后端提供了WebSocket服务和用户信息相关操作的API，接口为3000。系统架构主要包括以下几个组件：
+
+1. **WebSocket服务器**：处理客户端的WebSocket连接，接收和发送消息。
+2. **用户信息相关 API**：提供用户管理的接口。
+3. **数据存储**：使用mybatis进行持久化存储，数据库采用mysql
+
+
+#### 2.代码架构
+![alt text](1718811966600.png)
+
+#### 详细设计
+
+##### 2.1. WebSocket处理器
+
+
+##### 2.2. User信息相关
+**首先，定义数据结构User**：
+![alt text](1718811064989.png)
+其中zonepassed为通关数。
+
+**然后，使用mapper进行与数据库的映射**
+![alt text](1718811118505.png)
+
+**接着定义Userservice类型**
+![alt text](1718811215654.png)
+其中共包含8个服务，分别为用户登录、用户注册、更新过关数（自定义数量）、自增过关数、获取用户列表、获取单个用户信息、删除用户和更新用户。
+
+这里面需要注意的是
+![alt text](1718811354141.png)
+我们使用passwordencoder对密码进行加密处理，因为在用户信息传输的过程中，密码如果用明文传输会有泄漏风险。
+
+**最后开放api接口供前端访问**
+![alt text](1718811507195.png)
+
+**数据库**
+![alt text](1718811658033.png)
+可以看出密码是加密过进行存储的
+
+
+##### docker部署相关
+准备pj.sql作为建表语句
+![alt text](1718812021820.png)
+
+准备dockerfile准备构建镜像
+![alt text](1718812088666.png)
+
+
