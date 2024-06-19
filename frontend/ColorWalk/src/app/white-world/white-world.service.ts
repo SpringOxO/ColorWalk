@@ -64,7 +64,7 @@ export class WhiteWorld implements OnDestroy {
 
   loadModel() {
     const loader = new GLTFLoader();
-    loader.load('assets/models/1.glb', (gltf) => {
+    loader.load('assets/models/white_matrix.glb', (gltf) => {
       gltf.scene.traverse((child) => {
         if (child instanceof THREE.Mesh) {  // 使用 instanceof 检查 child 是否为 Mesh
           // 确保每个网格的材料支持顶点颜色
