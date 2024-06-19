@@ -1,4 +1,5 @@
 import { Component, Injectable } from '@angular/core';
+import { PaletteColorService } from '../palette-color.service';
 
 @Component({
   selector: 'app-eyedropper',
@@ -17,7 +18,7 @@ import { Component, Injectable } from '@angular/core';
 @Injectable()
 export class EyedropperComponent {
   hasEyeDrop: boolean;
-  public constructor() {
+  public constructor(private paletteColorService: PaletteColorService) {
     this.hasEyeDrop = 'EyeDropper' in window;
   }
 
@@ -39,9 +40,11 @@ export class EyedropperComponent {
       try {
         const result = await eyeDropper.open();
         console.log(result);
+        this.paletteColorService.changeColor(result.sRGBHex);
         let hexColor = result.sRGBHex.replace("#", "");
         decimalValue = parseInt(hexColor, 16);
         console.log('获得颜色: ' + result.sRGBHex);
+        
       } catch (e) {
         console.log('用户取消了取色');
       }

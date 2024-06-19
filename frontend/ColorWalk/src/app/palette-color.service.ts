@@ -13,6 +13,7 @@ export class PaletteColorService {
   currentColor = this.colorSource.asObservable();
   constructor() { }
   changeColor(color: string) {
+    console.log('color change: ' + color);
     this.colorSource.next(color);
   }
 }

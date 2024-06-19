@@ -45,6 +45,12 @@ export class PaletteComponent implements AfterViewChecked {
     private colorService: ColorService) { }
   
   ngOnInit() {
+    this.paletteColorService.currentColor.subscribe(currentColor => {
+      if (currentColor){
+        this.currentColor = currentColor;
+        this.currentColorDiv['background-color'] = currentColor!;
+      }
+    });
     this.colorService.currentColor.subscribe(color => {
       const eyeDropperColor = color;
       if (eyeDropperColor) {

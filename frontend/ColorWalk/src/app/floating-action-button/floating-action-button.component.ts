@@ -5,6 +5,7 @@ import { EyedropperComponent } from '../eyedropper/eyedropper.component';
 import { ColorService } from '../color.service';
 import { PaletteComponent } from '../palette/palette.component';
 import { PaletteCloseService } from '../palette-close.service';
+import { PaletteColorService } from '../palette-color.service';
 
 @Component({
   selector: 'app-floating-action-button',
@@ -15,11 +16,11 @@ import { PaletteCloseService } from '../palette-close.service';
 })
 export class FloatingActionButtonComponent {
   buttonsVisible = false;
-  private eyedropper = new EyedropperComponent();
+  private eyedropper = new EyedropperComponent(this.paletteColorService);
   hasEyeDrop = this.eyedropper.eyeDropper();
   showPalette: boolean = false;
 
-  constructor(private colorService: ColorService, private paletteCloseService: PaletteCloseService) {}
+  constructor(private colorService: ColorService, private paletteCloseService: PaletteCloseService, private paletteColorService : PaletteColorService) {}
 
   public ngOnInit(): void {
     this.paletteCloseService.currentCloseState.subscribe(close => {
