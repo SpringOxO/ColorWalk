@@ -1,21 +1,22 @@
 <div class="ui-painting">
-  <button (click)="onClose()"> 《 </button>
-  <mat-card class="left-panel">
+  <button class="close-button" (click)="onClose()"> 《 </button>
+  <div class="panels">
+  <mat-card class="top-panel">
     <mat-card-content>
-      <div id = "painting-frame" class="painting-frame">
-        <img id = "painting-image" src={{imgPath}} alt="Blurred Painting" style="max-width: 420px; height: auto;">
+      <div id="painting-frame" class="painting-frame">
+        <img id="painting-image" src={{imgPath}} alt="Blurred Painting">
       </div>
     </mat-card-content>
   </mat-card>
 
-  <mat-card class="right-panel">
+  <mat-card class="bottom-panel">
     <mat-card-header>
       <mat-card-title><h5>Toning!</h5></mat-card-title>
     </mat-card-header>
+    <mat-card-content>
     <div class="teardrops">
       <div class="teardrop large" [style.background-color]="currentColor"></div>
     </div>
-    <mat-card-content>
       <div class="color-selections">
         <div *ngFor="let drop of colorDrops" class="teardrop"
             [style.background-image]="drop.passed ? 'url(yes-45.svg)' : 'none'"
@@ -23,11 +24,12 @@
             [style.background-color]="drop.color"
             (click)="selectColor(drop)"
             [class.selected]="drop.selected">
-          </div>
+        </div>
       </div>
     </mat-card-content>
     <mat-card-actions class="ai-button">
       <button mat-button (click)="onOpenAI()">Ask AI</button>
     </mat-card-actions>
   </mat-card>
+  </div>
 </div>

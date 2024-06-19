@@ -37,16 +37,10 @@ export class World implements OnDestroy {
 
   requestID : number = 0; //动画id
 
+  isLatestRecord : boolean = false;
+
   public constructor(private ngZone: NgZone, private zonePassService : ZonePassService, private paintingNearService: PaintingNearService, private authService: AuthService) {
-    this.subscription = this.zonePassService.zoneNumber.subscribe(zoneNumber => {
-      // console.log(zoneNumber);
-      this.currentZonePassNumber = zoneNumber;
-    });
-    this.getMyZonePassedNumber().subscribe(zonePassedNumber => {
-      this.currentZonePassNumber = zonePassedNumber;
-      console.log(this.currentZonePassNumber);
-      this.zonePassService.passZone(this.currentZonePassNumber); //保险起见
-    });
+    
   }
 
   getMyZonePassedNumber(): Observable<number> {
@@ -117,6 +111,19 @@ export class World implements OnDestroy {
   }
 
   public createScene(canvas: ElementRef<HTMLCanvasElement>): void {
+    console.log("createscene!");
+    this.isLatestRecord = false; //设为假，在读取到学习记录之前先别加载场景
+    this.subscription = this.zonePassService.zoneNumber.subscribe(zoneNumber => {
+      // console.log(zoneNumber);
+      this.currentZonePassNumber = zoneNumber;
+    });
+    this.getMyZonePassedNumber().subscribe(zonePassedNumber => {
+      this.currentZonePassNumber = zonePassedNumber;
+      console.log(this.currentZonePassNumber);
+      this.zonePassService.passZone(this.currentZonePassNumber); //保险起见
+      this.isLatestRecord = true;
+      console.log('!' + this.currentZonePassNumber);
+    });
     this.zones = [];
     this.canvas = canvas.nativeElement;
 
@@ -239,7 +246,8 @@ export class World implements OnDestroy {
   }
 
   public render(): void {
-    while (this.currentZonePassNumber > this.preZonePassNumber){ //有区域应该解锁
+    // console.log('@'+this.currentZonePassNumber);
+    while (this.isLatestRecord && this.currentZonePassNumber > this.preZonePassNumber){ //有区域应该解锁
       console.log(this.zones.length);
       this.zones[this.zones.length - 1].zonePass();
       switch (this.preZonePassNumber){

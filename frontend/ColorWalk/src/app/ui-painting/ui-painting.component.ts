@@ -59,11 +59,8 @@ export class UiPaintingComponent {
     this.paletteSubscription = this.paletteColorService.currentColor.subscribe(color => {
       this.currentColor = color;
     });
-    // this.subscription = this.zonePassService.zoneNumber.subscribe(zoneNumber => {// 这里也用订阅，service里的永远是最权威的 用在下面？
-    //   this.currentZonePassNumber = zoneNumber;
-    // });
 
-    this.zonePassedSubscription = this.zonePassService.zoneNumberChanged$.subscribe(
+    this.zonePassedSubscription = this.zonePassService.zoneNumberChanged$.subscribe( //如果过关数改变就更新画
       zoneNumber => {
         this.currentZonePassNumber = zoneNumber;
         this.updatePainting();
@@ -120,6 +117,15 @@ export class UiPaintingComponent {
   updatePainting(){
     this.onHide();
     switch(this.currentZonePassNumber){
+      case 0:{
+        this.imgPath = "./assets/pictures/RYB.jpg";
+        this.colorDrops = [
+          { idx: 0, color: '#3254ff', selected: false, passed: false },
+          { idx: 1, color: '#e84040', selected: false, passed: false },
+          { idx: 2, color: '#f0b11e', selected: false, passed: false }
+        ];
+      }
+        break;
       case 1:
         {
           this.imgPath = "./assets/pictures/Sunday.jpg"
@@ -150,19 +156,16 @@ export class UiPaintingComponent {
   }
 
   applyRandomColorToImage(color: string) {
-    const imageElement = document.getElementById('painting-image');
+    const imageElement = document.getElementById('painting-frame');
     if (imageElement) {
       imageElement.style.backgroundColor = color;
-      imageElement.style.width = '100%';
-      imageElement.style.height = '100%';
-      imageElement.style.display = 'block';
     }
   }
 
   changeToRandomColor():string {
     const randomColor = this.getRandomColor();
     this.currentColor = randomColor;
-    this.imgPath = ""; // 或者设置为透明或空白图片的路径
+    this.imgPath = "./assets/pictures/transparent.png"; // 或者设置为透明或空白图片的路径
     console.log(`Changed to random color: ${randomColor}`);
     this.applyRandomColorToImage(randomColor);
     return randomColor;

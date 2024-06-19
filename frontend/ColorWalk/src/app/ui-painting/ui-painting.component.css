@@ -2,8 +2,36 @@
     border: 1px solid black;
     display: flex;
     justify-content: center;
+    align-items: center; /* 增加此行以实现垂直居中 */
+    max-width: 500px;
+    max-height: 400px;
+    margin: 0 auto;
+}
+
+.painting-frame img {
+    max-width: 500px;
+    max-height: 400px;
+    height: auto;
+    margin: auto; /* 增加此行以实现图片垂直居中 */
+}
+
+.close-button {
+    width: 50px;
+    min-height: 100%;
+    margin-right: 20px;
+}
+
+.panels {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.top-panel {
+    justify-content: center;
     align-items: center;
-    min-height: 650px;
+    min-height: 400px;
 }
 
 .teardrops {
@@ -11,8 +39,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 70%; /* 根据需要调整高度 */
-  }
+    height: 70%;
+}
+
+.bottom-panel{
+    min-height: 250px;
+}
 
 .large-teardrop,
 .small-teardrop {
@@ -25,15 +57,14 @@
 
 .color-selections {
     position: absolute;
-    top: 53%; /* 调整垂直位置 */
-    left: 50%; /* 调整水平位置 */
+    top: 53%;
+    left: 50%;
     transform: translate(-50%, -50%);
     z-index: 2;
     display: flex;
     justify-content: center;
     align-items: center;
-
-  }
+}
 
 .color-drop {
     width: 30px;
@@ -48,6 +79,7 @@
 }
 
 .ui-painting {
+    min-height: 750px;
     display: flex;
     justify-content: space-between;
     padding: 30px;
@@ -57,7 +89,6 @@
     width: 44px;
     height: 66px;
     background-color: #000;
-    /* background-image: url('/water.svg'); */
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
@@ -67,7 +98,6 @@
     border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
     transform: rotate(45deg);
     border: 2px solid #fff;
-
 }
 
 .teardrop.large {
@@ -89,13 +119,13 @@
     border: 2px solid #fff;
 }
 
-.ai-button{
+.ai-button {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.yes-img{
+.yes-img {
     transform: rotate(-45deg);
     scale: 0.2;
 }
