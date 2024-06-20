@@ -79,7 +79,7 @@ export class WhiteWorld implements OnDestroy {
             // 初始化颜色属性
             const colors = [];
             for (let i = 0; i < child.geometry.attributes.position.count; i++) {
-                colors.push(0.5, 0.5, 0);
+                colors.push(0.9, 0.9, 0.9);
             }
             child.geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
         }

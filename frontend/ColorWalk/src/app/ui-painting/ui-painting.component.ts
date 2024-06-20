@@ -27,6 +27,31 @@ interface ColorDrop {
 })
 export class UiPaintingComponent {
   imgPath : string = "./assets/pictures/RYB.jpg";
+  imgIntro : string = '';
+
+  imgIntroSet =[
+    '蒙德里安的《红黄蓝的构成》是荷兰风格派艺术的代表作之一。这幅画创作于1930年,'+
+    '以抽象的几何图形和三原色为主要元素,表现了蒙德里安对绝对纯粹、普遍和谐的追求。'+
+    '画面由黑色的垂直线和水平线分割成不规则的方块,部分方块填充以鲜艳的红、黄、蓝三种颜色,'+
+    '其余则为白色。这种简洁的构图强调了平面性和非对称性的美感,同时凸显了原色的强烈视觉冲击力。'+
+    '蒙德里安通过这种几何抽象的表现手法,剥离了一切具象元素,力图揭示隐藏在万物之后的普遍规律和绝对秩序。'+
+    '《红黄蓝的构成》完美体现了风格派"新造型主义"的核心思想,成为抽象艺术发展史上的里程碑之作。'
+    ,
+    '大碗岛的星期日下午是法国后印象派画家乔治·修拉的代表作之一,完成于1884年至1886年间。'+
+    '这幅画描绘了塞纳河畔大碗岛上巴黎人周日下午的休闲景象。'+
+    '画面中众多人物或三三两两交谈,或独自休憩,衣着鲜艳多彩,营造出轻松愉悦的氛围。'+
+    '修拉运用了标志性的点彩技法,用细小的点状色块构成画面,色彩明快丰富。整幅画构图稳健,'+
+    '人物、树木、水面与天空巧妙融合,呈现出一派祥和宁静的景象。'+
+    '这幅画生动再现了19世纪末巴黎市民的休闲生活,体现出修拉作为新印象主义代表画家精湛的艺术技巧,'+
+    '是印象派绘画的经典之作。它现藏于美国芝加哥艺术博物馆。'
+    ,
+    '莫奈的《日出印象》创作于1872年，是印象派绘画的代表作之一。'+
+    '这幅画描绘了法国勒阿弗尔港口的日出景象，朦胧的晨雾笼罩着港口，隐约可见船只的轮廓。'+
+    '莫奈通过快速的笔触和鲜明的色彩，捕捉了朝阳初升时那转瞬即逝的光影变化。'+
+    '橙色和蓝色的交织体现了日出时独特的色彩效果。这幅作品不仅展现了莫奈高超的写生技巧，'+
+    '也开启了印象派艺术注重光与色的先河，对西方现代绘画产生了深远影响。'+
+    '《日出印象》体现了印象派"捕捉瞬间，描绘光影"的创作理念，是莫奈的代表作，也是印象派艺术的标志性画作之一。',
+  ];
 
   currentColor : string | null = '#000000';  // 默认颜色
   private paletteSubscription!: Subscription; //同步调色板当前颜色的订阅
@@ -119,6 +144,7 @@ export class UiPaintingComponent {
     switch(this.currentZonePassNumber){
       case 0:{
         this.imgPath = "./assets/pictures/RYB.jpg";
+        this.imgIntro = this.imgIntroSet[0];
         this.colorDrops = [
           { idx: 0, color: '#3254ff', selected: false, passed: false },
           { idx: 1, color: '#e84040', selected: false, passed: false },
@@ -129,6 +155,7 @@ export class UiPaintingComponent {
       case 1:
         {
           this.imgPath = "./assets/pictures/Sunday.jpg"
+          this.imgIntro = this.imgIntroSet[1];
           this.colorDrops = [
             { idx: 0, color: '#bbb96c', selected: false, passed: false },
             { idx: 1, color: '#d06c42', selected: false, passed: false },
@@ -139,6 +166,7 @@ export class UiPaintingComponent {
       case 2:
         {
           this.imgPath = "./assets/pictures/Sunrise.jpg"
+          this.imgIntro = this.imgIntroSet[2];
           this.colorDrops = [
             { idx: 0, color: '#6c8593', selected: false, passed: false },
             { idx: 1, color: '#ce7a69', selected: false, passed: false },
@@ -147,6 +175,7 @@ export class UiPaintingComponent {
         }
         break;
       default:
+        this.imgIntro = '';
         const randomColor : string = this.changeToRandomColor();
         this.colorDrops = [
           { idx: 0, color: randomColor, selected: false, passed: false }
