@@ -37,7 +37,13 @@ export class World implements OnDestroy {
 
   requestID : number = 0; //动画id
 
-  isLatestRecord : boolean = false;
+  isLatestRecord : boolean = false; //用来判断是否已经读到数据库里真正的学习记录，否则刷新时前一个用户的学习记录还没被读到的真正数据覆盖（因为异步）场景就加载了
+
+
+  private listener: THREE.AudioListener = new THREE.AudioListener();
+  private audioPath:string = '';
+  private currentSounds: THREE.Audio [] = [];
+  private currentSoundNumber: number = -1;
 
   public constructor(private ngZone: NgZone, private zonePassService : ZonePassService, private paintingNearService: PaintingNearService, private authService: AuthService) {
     
@@ -102,6 +108,10 @@ export class World implements OnDestroy {
       // 清空场景
       this.scene = null!;
       this.camera = null!;
+
+      this.currentSoundNumber = -1;
+      this.audioPath = '';
+      this.reloadAudio();
   
       // 取消订阅
       if (this.subscription) {
@@ -161,7 +171,7 @@ export class World implements OnDestroy {
   initZone2 (){
     const zone2 : Zone2 = new Zone2(this, this.zones[this.zones.length - 1].endV.clone());
     this.zones.push(zone2);
-
+    
     // this.initZone3();
   }
 
@@ -204,6 +214,38 @@ export class World implements OnDestroy {
     this.camera.position.set(30, 30, 30);
     this.camera.lookAt(new THREE.Vector3(0, 0, 0));
     this.scene.add(this.camera);
+
+    
+    this.camera.add(this.listener);
+    this.reloadAudio();
+  }
+
+  reloadAudio (){
+    // 停止并释放之前的音频
+    while(this.currentSounds.length > 0){
+      const currentSound = this.currentSounds.pop();
+      if (currentSound){
+        currentSound.stop();
+        currentSound.disconnect();
+      }
+    }
+
+    // 加载音频文件
+    if (this.audioPath != ''){
+      const audioLoader = new THREE.AudioLoader();
+      const sound = new THREE.Audio(this.listener);
+      audioLoader.load(this.audioPath, (buffer) => {
+        sound.setBuffer(buffer);
+        sound.setLoop(true);
+        sound.setVolume(0.5);
+        sound.play();
+        console.log("new audio!");
+
+        // 保存对当前音频的引用
+        this.currentSounds.push(sound);
+      });
+    }
+    
   }
 
   cameraFollow() {
@@ -227,6 +269,10 @@ export class World implements OnDestroy {
     this.camera.lookAt(lookPosition);
     
   }
+
+  getPlayerZ(): number{ //用于得到玩家位置，更新背景透明度
+    return this.player.model.position.z;
+  }
   
 
   public animate(): void {
@@ -247,8 +293,42 @@ export class World implements OnDestroy {
 
   public render(): void {
     // console.log('@'+this.currentZonePassNumber);
-    while (this.isLatestRecord && this.currentZonePassNumber > this.preZonePassNumber){ //有区域应该解锁
-      console.log(this.zones.length);
+    
+    if (this.camera && this.currentSoundNumber != Math.min(this.currentZonePassNumber, 3)){ // 如果不是当前应该播放的音乐，就reload
+      console.log("caonima");
+      switch (Math.min(this.currentZonePassNumber, 3)){
+        case 0:
+          this.currentSoundNumber = 0;
+          this.audioPath = './assets/audio/Canon_In_D.mp3';
+          this.reloadAudio();
+          break;
+        case 1:
+          this.currentSoundNumber = 1;
+          this.audioPath = './assets/audio/Rhapsody_In_Blue.mp3';
+          this.reloadAudio();
+          break;
+        case 2:
+          this.currentSoundNumber = 2;
+          this.audioPath = './assets/audio/Symphony_6_In_F.mp3';
+          this.reloadAudio();
+          break;
+        case 3:
+          this.currentSoundNumber = 3;
+          this.audioPath = './assets/audio/Night_5.mp3';
+          this.reloadAudio();
+          break;
+        default:
+          break;
+      }
+    }
+
+    if (this.camera && this.currentSounds.length > 1){ //如果当前播放的不止一首，就reload
+      console.log(this.currentSounds.length);
+      this.reloadAudio();
+    }
+    
+    while (this.camera && this.isLatestRecord && this.currentZonePassNumber > this.preZonePassNumber){ //有区域应该解锁
+      console.log(this.currentSoundNumber);
       this.zones[this.zones.length - 1].zonePass();
       switch (this.preZonePassNumber){
         case 0:
@@ -265,6 +345,7 @@ export class World implements OnDestroy {
       }
       this.preZonePassNumber ++;
     }
+
 
     this.requestID = requestAnimationFrame(() => {
       this.render();

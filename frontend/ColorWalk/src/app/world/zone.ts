@@ -17,11 +17,15 @@ export class Zone {
     public passed : boolean = false;
     public blocked : boolean = true;
 
+    
+    public backgroundMaterials: THREE.MeshStandardMaterial[] = []; //进入区域和离开时的背景透明度变化
+
     constructor(public world: World, public startV : THREE.Vector3) {
         this.endV = startV.clone();
         this.loadCorridorModel();
         this.loadAirWall();
         this.loadPainting();
+        this.loadSkyBox();
         this.loadDecorationModel();
     }
 
@@ -30,6 +34,8 @@ export class Zone {
     loadAirWall(): void{}
 
     loadPainting(): void{}
+
+    loadSkyBox(): void {}
 
     zonePass(): void {this.passed = true;} //标记通过，在update时才会移除，这是有些复杂的异步带来的麻烦：有时还没有装载好空气墙就已经要调用zonepass了。
 
@@ -48,6 +54,34 @@ export class Zone {
                 }
                 console.log(this.world.airWalls.length);
                 this.blocked = false;
+            }
+        }
+
+        const z = this.world.getPlayerZ();
+        if (z < this.startV.z + 1 && z > this.endV.z + 1){ //+1为了限制在严格的区域内
+            if (this.startV.z - z < 0){ //第一格中心渐变完全
+                const opacity = (this.startV.z - z + 1) / 1;
+                this.backgroundMaterials.forEach((material) => {
+                    material.opacity = opacity;
+                });
+            
+            } else {
+                this.backgroundMaterials.forEach((material) => {
+                    material.opacity = 1;
+                });
+            }
+        }
+        else {
+            if (z < this.endV.z + 1 && z > this.endV.z){
+                const opacity = (z - this.endV.z) / 1;
+                this.backgroundMaterials.forEach((material) => {
+                    material.opacity = opacity;
+                });
+            }
+            else {
+                this.backgroundMaterials.forEach((material) => {
+                    material.opacity = 0;
+                });
             }
         }
     }
@@ -107,6 +141,24 @@ export class Zone1 extends Zone {
         });
     }
 
+    override loadSkyBox(): void {
+        const loader = new GLTFLoader();
+        loader.load('assets/models/skybox_1.glb', (gltf) => {
+            gltf.scene.traverse((child) => { //设置透明
+                if (child instanceof THREE.Mesh) {
+                    const material = child.material;
+                    material.transparent = true;
+                    material.opacity = 0;
+                    this.backgroundMaterials.push(material);
+                }
+            });
+            gltf.scene.scale.x = gltf.scene.scale.y = gltf.scene.scale.z = 0.99;
+            this.world.scene.add(gltf.scene);
+            const pos = this.startV.clone();
+            gltf.scene.position.set(pos.x, pos.y, pos.z);
+        });
+    }
+
 
     override loadDecorationModel(): void {
         const loader = new GLTFLoader();
@@ -154,7 +206,6 @@ export class Zone1 extends Zone {
 export class Zone2 extends Zone {
     private corridorMaterials: THREE.MeshStandardMaterial[] = [];//用来做模型透明度变化，虽然那些material不是MeshStandardMaterial，但不知道为什么这数组能用
     private fadeDuration: number = 2; // 渐变持续时间(秒)
-
 
     private lines_y: THREE.Group[] = [];
     private lines_y_base_pos : THREE.Vector3[] = [];
@@ -228,6 +279,24 @@ export class Zone2 extends Zone {
             gltf.scene.visible = false;
             gltf.scene.name = this.airWallUnitName;
             this.world.airWalls.push(gltf.scene);
+        });
+    }
+
+    override loadSkyBox(): void {
+        const loader = new GLTFLoader();
+        loader.load('assets/models/skybox_2.glb', (gltf) => {
+            gltf.scene.traverse((child) => { //设置透明
+                if (child instanceof THREE.Mesh) {
+                    const material = child.material;
+                    material.transparent = true;
+                    material.opacity = 0;
+                    this.backgroundMaterials.push(material);
+                }
+            });
+
+            this.world.scene.add(gltf.scene);
+            const pos = this.startV.clone();
+            gltf.scene.position.set(pos.x, pos.y, pos.z);
         });
     }
 
@@ -305,11 +374,13 @@ export class Zone2 extends Zone {
             this.corridorMaterials.forEach((material) => {
               material.opacity = opacity;
             });
-          } else {
+        } else {
             this.corridorMaterials.forEach((material) => {
               material.opacity = 1;
             });
         }
+
+        
 
         const amplitude = 1;
         const frequency = 1.5;
@@ -401,6 +472,25 @@ export class Zone3 extends Zone {
             gltf.scene.visible = false;
             gltf.scene.name = this.airWallUnitName;
             this.world.airWalls.push(gltf.scene);
+        });
+    }
+
+    override loadSkyBox(): void {
+        const loader = new GLTFLoader();
+        loader.load('assets/models/skybox_3.glb', (gltf) => {
+            gltf.scene.traverse((child) => { //设置透明
+                if (child instanceof THREE.Mesh) {
+                    const material = child.material;
+                    material.transparent = true;
+                    material.opacity = 0;
+                    this.backgroundMaterials.push(material);
+                }
+            }); 
+            gltf.scene.scale.x = gltf.scene.scale.y = gltf.scene.scale.z = 1.01;
+
+            this.world.scene.add(gltf.scene);
+            const pos = this.startV.clone();
+            gltf.scene.position.set(pos.x, pos.y, pos.z);
         });
     }
 
@@ -535,6 +625,25 @@ export class Zone4 extends Zone {
 
             this.world.scene.add(gltf.scene);
             const pos = this.endV.clone().add(new THREE.Vector3(0, 2, 0));
+            gltf.scene.position.set(pos.x, pos.y, pos.z);
+        });
+    }
+
+    override loadSkyBox(): void {
+        const loader = new GLTFLoader();
+        loader.load('assets/models/skybox_pink.glb', (gltf) => {
+            gltf.scene.traverse((child) => { //设置透明
+                if (child instanceof THREE.Mesh) {
+                    const material = child.material;
+                    material.transparent = true;
+                    material.opacity = 0;
+                    this.backgroundMaterials.push(material);
+                }
+            }); 
+            gltf.scene.scale.x = gltf.scene.scale.y = gltf.scene.scale.z = 1.02;
+
+            this.world.scene.add(gltf.scene);
+            const pos = this.startV.clone();
             gltf.scene.position.set(pos.x, pos.y, pos.z);
         });
     }
