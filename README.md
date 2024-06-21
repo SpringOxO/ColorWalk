@@ -18,7 +18,7 @@ https://github.com/SpringOxO/ColorWalk
 
 #### 1.页面截图
 
-<img src = './ui.jpg'>
+<img src = './ReadmeImgs/ui.jpg'>
 
 #### 2.代码组织结构
 
@@ -153,7 +153,7 @@ https://github.com/SpringOxO/ColorWalk
 
 #### 3.系统架构
 
-<img src = './fe.drawio.jpg'>
+<img src = './ReadmeImgs/fe.drawio.jpg'>
 
 #### 4.设计模式
 
@@ -416,7 +416,7 @@ mixColor(color: string) {
 
 
 #### 2.代码架构
-![alt text](1718811966600.png)
+![alt text](./ReadmeImgs/1718811966600.png)
 
 #### 详细设计
 
@@ -425,34 +425,34 @@ mixColor(color: string) {
 
 ##### 2.2. User信息相关
 **首先，定义数据结构User**：
-![alt text](1718811064989.png)
+![alt text](./ReadmeImgs/1718811064989.png)
 其中zonepassed为通关数。
 
 **然后，使用mapper进行与数据库的映射**
-![alt text](1718811118505.png)
+![alt text](./ReadmeImgs/1718811118505.png)
 
 **接着定义Userservice类型**
-![alt text](1718811215654.png)
+![alt text](./ReadmeImgs/1718811215654.png)
 其中共包含8个服务，分别为用户登录、用户注册、更新过关数（自定义数量）、自增过关数、获取用户列表、获取单个用户信息、删除用户和更新用户。
 
 这里面需要注意的是
-![alt text](1718811354141.png)
+![alt text](./ReadmeImgs/1718811354141.png)
 我们使用passwordencoder对密码进行加密处理，因为在用户信息传输的过程中，密码如果用明文传输会有泄漏风险。
 
 **最后开放api接口供前端访问**
-![alt text](1718811507195.png)
+![alt text](./ReadmeImgs/1718811507195.png)
 
 **数据库**
-![alt text](1718811658033.png)
+![alt text](./ReadmeImgs/1718811658033.png)
 可以看出密码是加密过进行存储的
 
 
 ##### docker部署相关
 准备pj.sql作为建表语句
-![alt text](1718812021820.png)
+![alt text](./ReadmeImgs/1718812021820.png)
 
 准备dockerfile准备构建镜像
-![alt text](1718812088666.png)
+![alt text](./ReadmeImgs/1718812088666.png)
 
 
 #### 2.3 socket
