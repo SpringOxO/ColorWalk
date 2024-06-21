@@ -640,7 +640,7 @@ export class Zone4 extends Zone {
                     this.backgroundMaterials.push(material);
                 }
             }); 
-            gltf.scene.scale.x = gltf.scene.scale.y = gltf.scene.scale.z = 1.02;
+            gltf.scene.scale.x = gltf.scene.scale.y = gltf.scene.scale.z = 1.03;
 
             this.world.scene.add(gltf.scene);
             const pos = this.startV.clone();
