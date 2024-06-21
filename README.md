@@ -1,5 +1,8 @@
 # ColorWalk - 基于Web3D的多人在线色彩学习平台
 
+## 项目地址
+https://github.com/SpringOxO/ColorWalk
+
 ## 分工情况
 
 | 姓名  | 学号          | 工作内容 | 贡献比例 |
